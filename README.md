@@ -51,6 +51,25 @@ python3 generate.py -f 2bit_half_adder.logic.json | tee 2bit_half_adder.diagram.
 ```
 
 
+After having generated your diagram JSON file, ...
+
+1. go to [wokwi.com](https://wokwi.com)
+1. start a new project
+   (e.g. choosing "Arduino Nano", that's not really relevant for the logic designs unless you want to control/test them with an Arduino or other microcontroller; however, all components will be deleted in the next steps)
+1. switch the editor view from tab `sketch.ino` to tab `diagram.json`
+1. select all the text in the editor and delete it
+1. paste the contents of the generated JSON files
+1. add components on the input and output side of your design
+1. have fun simulating everything
+
+> **Warning**
+> When using an 8-pin DIP switch for the inputs, make sure to connect one end to VCC and the other end to a pull-down resistor (connected to GND). Otherwise the output may act in a non-deterministic way.
+
+> **Note**
+> - You currently need to optimize the wires of your layout manually.
+> - You can add textual descriptions to your schematic using parts of type `wokwi-text`.
+
+
 ## Installation and dependencies
 
 Resolve all requirements using `pip3`:
@@ -81,12 +100,16 @@ The author says:
 
 ## Demo designs
 
-* `2bit_half_adder.logic.json`: 2-bit half adder (is not fully working yet)
-* `2bit_full_adder.logic.json`: 2-bit full adder (is not fully working yet)
+* `2bit_half_adder.logic.json`: 2-bit half adder ([Wokwi demo project](https://wokwi.com/projects/341979369318646355))
+* `2bit_full_adder.logic.json`: 2-bit full adder ([Wokwi demo project](https://wokwi.com/projects/341985679348073043))
 * `limited-ascii_7segment_lut.logic.json`: limited ASCII character range to 7-segment Wokwi display (is not fully working yet?)
 * `4bit-popcount.json`: 4-bit popcount (makes the generator hang up)
 
 For descriptions of the demo designs, inspect their JSON files.
+
+> **Warning**
+> The Quine McCluskey algorithm currently does not give deterministic results. An issue has been opened [here](https://github.com/tpircher/quine-mccluskey/issues/8).
+
 
 ## Termination of unsed gate inputs
 
