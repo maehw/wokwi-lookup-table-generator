@@ -7,6 +7,50 @@ This project is written in Python3.
 This project is WIP. Feel free to contribute, open issues, etc.
 
 
+## Usage
+
+```
+$ python3 generate.py -h
+usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE]
+
+generate.py is a lookup table generator tool for wokwi
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         log level (-v: INFO, -vv: DEBUG) (default: 0)
+  -f IN_FILE, --file IN_FILE
+                        path to JSON logic input file; if none is given, stdout is used (default: logic.json)
+  -o OUT_FILE, --outfile OUT_FILE
+                        path to generated wokwi schematic file (default: None)
+```
+
+Examples:
+
+Only specifying the input file name, will dump the wokwi schematic via `stdout`:
+
+```
+python3 generate.py -f 2bit_half_adder.logic.json
+```
+
+Only specifying the input file name, will dump the wokwi schematic via `stdout` (piped to `/dev/null`), log level `DEBUG`:
+
+```
+python3 generate.py -f 2bit_half_adder.logic.json -vv > /dev/null
+```
+
+Specify an output file for the wokwi schematic:
+
+```
+python3 generate.py -f 2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json
+```
+
+Specify an output file for the wokwi schematic externally but also show contents on `stdout` by [piping it through `tee`](https://en.wikipedia.org/wiki/Tee_(command)):
+
+```
+python3 generate.py -f 2bit_half_adder.logic.json | tee 2bit_half_adder.diagram.json
+```
+
+
 ## Installation and dependencies
 
 Resolve all requirements using `pip3`:
@@ -29,12 +73,15 @@ The author says:
 
 - document limitations
 - add assertions
-- make log level configurable
 - use a more object-oriented approach for everything
 - implement interactive mode
-- allow configuration data to be fed in as an external file
 - perform sanity checks to see if all parts are connected,
   some may be unused due to bugs (probably rounding)
+
+
+## Limitations
+
+TBD
 
 
 ## Termination of unsed gate inputs

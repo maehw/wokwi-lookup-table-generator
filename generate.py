@@ -3,16 +3,30 @@ import json
 import math
 import coloredlogs, logging
 from quine_mccluskey import qm
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 # Copyright (c) maehw, 2022
 # wokwi-lookup-table-generator is licensed under the GNU General Public License v3.0
 # Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='%(prog)s')
+    parser = ArgumentParser(description='%(prog)s is a lookup table generator tool for wokwi',
+                            formatter_class=ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('-v', '--verbose', action='count', default=0)
+    parser.add_argument('-v', '--verbose',
+                        action='count',
+                        help='log level (-v: INFO, -vv: DEBUG)',
+                        default=0)
+
+    parser.add_argument('-f', '--file',
+                        dest='in_file',
+                        help='path to JSON logic input file; if none is given, stdout is used',
+                        default="logic.json")
+
+    parser.add_argument('-o', '--outfile',
+                        dest='out_file',
+                        help='path to generated wokwi schematic file',
+                        default=None)
 
     args = parser.parse_args()
 
@@ -230,11 +244,14 @@ if __name__ == '__main__':
     #   (e.g. for three inputs: 000, 001, 010, 011, 100, ..., 110, 111)
     # - make input names optional (and use default ones, e.g. 'a', 'b', 'c', ...)
 
-    in_filename = "logic.json"
     in_data = {}
-    with open(in_filename, 'r') as f:
-        in_data = json.loads( f.read() )
-        log.info(f"Data is read from input file '{in_filename}'" )
+    try:
+        with open(args.in_file, 'r') as f:
+            in_data = json.loads( f.read() )
+            log.info(f"Data is read from input file '{args.in_file}'")
+    except FileNotFoundError:
+        log.error(f"Input file '{args.in_file}' cannot be found. Use flag '-h' to get usage.")
+        exit(1)
 
     # the 'logic' dictionary used within this script defines the
     # - names of the output variables
@@ -644,9 +661,10 @@ if __name__ == '__main__':
 
     #log.debug( json.dumps(logic_meta, indent=4) )
 
-    log.info(f"Writing final wokwi design file '{out_filename}'...")
-    with open(out_filename, 'w') as f:
-        json.dump(wokwi_design, f, indent=4)
-
-    #log.info("Dumping final wokwi design to stdout...")
-    #print(json.dumps(wokwi_design, indent=4))
+    if args.out_file:
+        log.info(f"Writing final wokwi design file '{args.out_file}'...")
+        with open(args.out_file, 'w') as f:
+            json.dump(wokwi_design, f, indent=4)
+    else:
+        log.info("Dumping final wokwi design to stdout...")
+        print( json.dumps(wokwi_design, indent=4) )
