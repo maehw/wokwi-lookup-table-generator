@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "description": "A simple OR gate with two inputs. (Doesn't really make sense to have such a design but it's nice for testing.)",
+  "inputs": ["a", "b"],
+  "outputs": {
+    "Y": [0, 1, 1, 1]
+  }
+}

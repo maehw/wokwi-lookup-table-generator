@@ -100,18 +100,38 @@ The author says:
 
 ## Demo designs
 
-* `2bit_half_adder.logic.json`: 2-bit half adder
-   ([Wokwi demo project](https://wokwi.com/projects/341979369318646355))
-* `2bit_full_adder.logic.json`: 2-bit full adder
-   ([Wokwi demo project](https://wokwi.com/projects/341985679348073043))
-* `limited-ascii_7segment_lut.logic.json`: limited ASCII character range to 7-segment Wokwi display
-   ([basic Wokwi demo project](https://wokwi.com/projects/341987347359859282), [advanced Wokwi demo project](https://wokwi.com/projects/341989925253546578) cycling through the character set with an Arduino disclosing encoding errors)
-* `4bit-popcount.json`: 4-bit popcount (makes the generator hang up)
-
 For descriptions of the demo designs, inspect their JSON files.
 
 > **Warning**
 > The Quine McCluskey algorithm currently does not give deterministic results. An issue has been opened [here](https://github.com/tpircher/quine-mccluskey/issues/8).
+
+Some demos are working, some seem to cause trouble.
+
+### Working demos
+
+* [2bit_half_adder.logic.json]: 2-bit half adder
+
+  ([Wokwi demo project](https://wokwi.com/projects/341979369318646355))
+
+* [2bit_full_adder.logic.json]: 2-bit full adder
+
+  ([Wokwi demo project](https://wokwi.com/projects/341985679348073043))
+* [2bit_and.logic.json]: 2-bit AND (as simple as an AND gate, but generated using a truth table)
+
+  ([Wokwi demo project](https://wokwi.com/projects/341992203508253267))
+
+* [2bit_or.logic.json]: 2-bit OR (as simple as an OR gate, but generated using a truth table)
+
+  ([Wokwi demo project](https://wokwi.com/projects/341992743611925075))
+
+
+### Non-working demos
+
+* [limited-ascii_7segment_lut.logic.json]: limited ASCII character range to 7-segment Wokwi display
+
+  ([basic Wokwi demo project](https://wokwi.com/projects/341987347359859282), [advanced Wokwi demo project](https://wokwi.com/projects/341989925253546578) cycling through the character set with an Arduino disclosing encoding errors)
+
+* [4bit-popcount.json]: 4-bit popcount (makes the generator hang up)
 
 
 ## Termination of unsed gate inputs
