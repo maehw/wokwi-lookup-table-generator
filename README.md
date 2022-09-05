@@ -9,11 +9,21 @@ This project is WIP. Feel free to contribute, open issues, etc.
 
 ## Installation and dependencies
 
-TODO: Move dependencies into `requirements.txt` and resolve them.
+This project depends on the package `quine-mccluskey` a [Python implementation of the Quine McCluskey algorithm](https://pypi.org/project/quine-mccluskey/).
 
-> qm is inside /usr/local/lib/python3.10/site-packages/quine_mccluskey
-> `pip3 install quine-mccluskey` installs it, but is cannot be found; why?
+The author says:
 
+> This implementation of the Quine McCluskey algorithm has no inherent limits (other than the calculation time) on the size of the inputs.
+
+I had problems installing the package with pip.
+
+`pip3 install quine-mccluskey` installs it, but is cannot be found when importing it. Does anybody know why?
+
+The module can be found inside `/usr/local/lib/python3.10/site-packages/quine_mccluskey` on my machine (`pip3 list -v`).
+So the current workaround is to move the Python script there and execute it from there (ugly, true).
+
+
+TODO: Move dependencies into `requirements.txt` and resolve them correctly.
 
 ## TODOs
 
@@ -31,10 +41,13 @@ TODO: Move dependencies into `requirements.txt` and resolve them.
 
 I have basically identified two termination strategies:
 
-The unused input pin of a 2 input AND gate can
+The unused input pin of a 2 input *AND* gate can
+
 1. either be pulled HIGH or
 1. be connected to the other input
-The unused input pin of a 2 input OR gate can
+
+The unused input pin of a 2 input *OR* gate can
+
 1. either be pulled LOW or
 1. be connected to the other input
 
