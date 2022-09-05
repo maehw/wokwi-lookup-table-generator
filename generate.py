@@ -499,6 +499,7 @@ if __name__ == '__main__':
                 # starting point
                 input_gates_for_stage = current_term_and_gates_for_first_stage
 
+                log.warning("Entering potential endless loop (trying to merge AND gates)")
                 depth = 1
                 while True:
                     output_and_gates_for_stage = []
@@ -626,6 +627,7 @@ if __name__ == '__main__':
             log.info("Only single OR gate, therefore directly connect it to the output buffer")
             final_or_gate_for_output = input_gates_for_stage[0]
         else:
+            log.warning("Entering potential endless loop (trying to merge OR gates)")
             while True:
                 output_or_gates_for_stage = []
 
