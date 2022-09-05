@@ -161,8 +161,8 @@ if __name__ == '__main__':
 
         if global_and_gate_idx >= 0:
             num_open_ports = 2 - global_and_gate_used_inports
-            log.debug(f"    Terminating AND gate #{global_and_gate_idx}'s {num_open_ports} open input(s)")
             if num_open_ports > 0:
+                log.debug(f"    Terminating AND gate #{global_and_gate_idx}'s {num_open_ports} open input(s)")
                 con = [ f"gate_and_{global_and_gate_idx}:A", f"gate_and_{global_and_gate_idx}:B",
                         con_color_termination, default_con_termination_instr ]
                 wokwi_design["connections"].append(con)
@@ -175,29 +175,29 @@ if __name__ == '__main__':
 
         if global_or_gate_idx >= 0:
             num_open_ports = 2 - global_or_gate_used_inports
-            log.debug(f"    Terminating OR gate #{global_or_gate_idx}'s {num_open_ports} open input(s)")
             if num_open_ports > 0:
+                log.debug(f"    Terminating OR gate #{global_or_gate_idx}'s {num_open_ports} open input(s)")
                 con = [ f"gate_or_{global_or_gate_idx}:A", f"gate_or_{global_or_gate_idx}:B",
                         con_color_termination, default_con_termination_instr ]
                 wokwi_design["connections"].append(con)
                 log.debug("      Connection: "+str(con))
                 global_or_gate_used_inports = 2
 
-    def switch_to_next_or_gate():
+    def select_next_or_gate():
         global global_or_gate_idx
         global global_or_gate_used_inports
 
         global_or_gate_idx += 1
-        log.debug(f"    Switched to non-existing OR gate #{global_or_gate_idx}")
+        log.debug(f"    Selected next (non-existing) OR gate #{global_or_gate_idx}")
 
         global_or_gate_used_inports = 0
 
-    def switch_to_next_and_gate():
+    def select_next_and_gate():
         global global_and_gate_idx
         global global_and_gate_used_inports
 
         global_and_gate_idx += 1
-        log.debug(f"    Switched to AND gate #{global_and_gate_idx}")
+        log.debug(f"    Selected next AND gate #{global_and_gate_idx}")
 
         global_and_gate_used_inports = 0
 
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
         # we need to connect, let's see if we can still use the current gate (check for free input ports)
         if global_and_gate_used_inports >= 2:
-            switch_to_next_and_gate()
+            select_next_and_gate()
 
         retval = (global_and_gate_idx, global_and_gate_used_inports, ['A', 'B'][global_and_gate_used_inports])
         global_and_gate_used_inports += 1
@@ -220,7 +220,7 @@ if __name__ == '__main__':
 
         # we need to connect, let's see if we can still use the current gate (check for free input ports)
         if global_or_gate_used_inports >= 2:
-            switch_to_next_or_gate()
+            select_next_or_gate()
 
         retval = (global_or_gate_idx, global_or_gate_used_inports, ['A', 'B'][global_or_gate_used_inports])
         global_or_gate_used_inports += 1
@@ -400,7 +400,14 @@ if __name__ == '__main__':
         wokwi_gate_not_inst["top"] = (2*k + 1)*wokwi_gate_spacing_v
         wokwi_gate_not_inst["left"] = 0
         wokwi_design["parts"].append(wokwi_gate_not_inst)
+
+        # directly connect the negated inputs to the buffers of the non-negated inputs
+        con = [ f"input_not_{input_names[k]}:IN", f"input_{input_names[k]}:IN",
+                con_color_termination, default_con_termination_instr ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
     log.debug("Added input buffer and NOT gate parts to the wokwi design")
+    log.debug("Also connected their inputs together as they are derived from the same inputs")
 
     # AND gates
     for k in range(num_all_and_gates):
@@ -412,8 +419,9 @@ if __name__ == '__main__':
     log.debug("Added AND gate parts to the wokwi design")
 
     # ------------------------------------------------------------------------------
-    # second iteration over all outputs is to connect inputs with first stage of
-    # AND gates
+    # second iteration over all outputs is to connect inputs with first stage of AND gates
+    log.info("")
+    log.info("Connecting inputs with first stage of AND gates for every output.")
     for output in logic:
         log.info(f"Connecting input inside the wokwi design to first AND gate stage (later used for output {output})...")
 
@@ -425,7 +433,7 @@ if __name__ == '__main__':
             # if the last AND gate has not been fully used, connect any unconnected input to VCC
             terminate_current_and_gate()
 
-            switch_to_next_and_gate()
+            select_next_and_gate()
 
             # iterate over every input variable and see if it is used or not;
             # if it is used check if the negated or original variable is used
@@ -464,12 +472,13 @@ if __name__ == '__main__':
         log.info(f"All AND gates required in the first AND gate stage for output {output}: {str(logic_meta[output]['and_gates_first_stage'])}")
         # next loop iteration for the function of the next output
         # ------------------------------------------------------------------------------
-
-    #log.info( json.dumps(logic_meta, indent=2) )
+    log.info("Connecting inputs with first stage of AND gates for every output completed.")
 
     # ------------------------------------------------------------------------------
     # third iteration merges all first stage AND gates down to a single 'root'
     # and gate as output of the CNF term -- which then in turn will need to be OR'ed to get the output
+    log.info("")
+    log.info("Merges all first stage AND gates down to a single 'root' AND gate (for every term of every output)")
     for output in logic:
         and_gates_for_first_or_stage = []
 
@@ -480,7 +489,7 @@ if __name__ == '__main__':
                 log.error("Something went wrong with the first stage of AND gates for current term.")
             elif len(current_term_and_gates_for_first_stage) == 1:
                 output_and_gates_for_stage = current_term_and_gates_for_first_stage[0]
-                log.info(f"Single AND gate {output_and_gates_for_stage} does not need to be merged.")
+                log.info(f"Single AND gate #{output_and_gates_for_stage} does not need to be merged.")
                 and_gates_for_first_or_stage.append(output_and_gates_for_stage)
             elif len(current_term_and_gates_for_first_stage) > 1:
                 log.info(f"Merging AND gates {current_term_and_gates_for_first_stage} down to single AND gate...")
@@ -524,22 +533,43 @@ if __name__ == '__main__':
 
         log.info(f"Remaining AND gates (final stage): {and_gates_for_first_or_stage} for the output {output} to be connected to OR gates")
         logic_meta[output]['inputs_for_first_or_gate_stage'] = and_gates_for_first_or_stage
+    log.info("Merges of all first stage AND gates down to a single 'root' AND gate completed.")
 
     # ------------------------------------------------------------------------------
-    # fourth iteration creates first stage of OR gates for the current output,
-    # and connects the AND gate outputs to it
+    # fourth iteration creates first stage of OR gates (in order to OR all terms for every output);
+    # and connects the AND gate from the previous stage (=the final AND stage) to it
+    log.info("")
+    log.info("Combining mini terms: Create first stage of OR gates (in order to OR all terms for every output) ")
+    log.info("and connect the AND gate from the previous stage (=the final AND stage) to it.")
     for output in logic:
         terminate_current_or_gate()
 
-        switch_to_next_or_gate()
+        select_next_or_gate()
+
+        output_or_gates_for_stage = []
 
         gates_for_first_stage = logic_meta[output]['inputs_for_first_or_gate_stage']
 
         if len(gates_for_first_stage) == 0:
             log.error("Something went wrong with the first stage of OR gates for current output.")
         elif len(gates_for_first_stage) == 1:
-            log.info(f"Single AND gate output (AND gate #{gates_for_first_stage[0]}) does not need to be connected to any OR gate and then merged down.")
-            log.error(f"TODO: save 'gate_and_{gates_for_first_stage[0]}' for later")
+            log.warning(f"Single mini term for output {output}: AND gate output (AND gate #{gates_for_first_stage[0]})")
+            log.warning("Creating a dummy OR gate (which does not need to be then merged down).")
+
+            (or_gate_idx, or_gate_port_idx, or_gate_port_name) = allocate_next_free_or_gate_inport()
+
+            # put OR gate in a list as reminder to work on them later
+            output_or_gates_for_stage.append(or_gate_idx)
+
+            # connect AND gate's output port to OR gate's input port
+            con = [ f"gate_and_{gates_for_first_stage[0]}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
+                    con_color_and_or_interconnect, default_con_instr ]
+            log.debug("    Connection: "+str(con))
+            wokwi_design["connections"].append(con)
+
+            # directly terminate it, as it's only a dummy OR gate (second inport not needed)
+            terminate_current_or_gate()
+
         elif len(gates_for_first_stage) > 1:
             log.info(f"Connecting outputs of AND gates {gates_for_first_stage} to OR gate...")
 
@@ -547,10 +577,6 @@ if __name__ == '__main__':
 
             for input_gate_for_stage in gates_for_first_stage:
                 (or_gate_idx, or_gate_port_idx, or_gate_port_name) = allocate_next_free_or_gate_inport()
-
-                # object does not exist yet
-                #if or_gate_port_idx == 0:
-                #    get_part_by_id(f"gate_or_{or_gate_port_idx}")["left"] += wokwi_gate_spacing_h
 
                 # put OR gate in a list as reminder to work on them later
                 output_or_gates_for_stage.append(or_gate_idx)
@@ -562,18 +588,23 @@ if __name__ == '__main__':
                 wokwi_design["connections"].append(con)
 
                 # remove duplicates
-                output_and_gates_for_stage = list(set(output_or_gates_for_stage))
+                output_or_gates_for_stage = list(set(output_or_gates_for_stage))
 
         terminate_current_or_gate()
 
-        log.info(f"First stage of OR gates (connected to AND gates): {output_and_gates_for_stage} for output {output}")
-        logic_meta[output]['or_gates_first_stage'] = output_and_gates_for_stage
+        log.info(f"First stage of OR gates (connected to AND gates): {output_or_gates_for_stage} for output {output}")
+        logic_meta[output]['or_gates_first_stage'] = output_or_gates_for_stage
+    log.info("Done combining mini terms (AND gates) by first stage of OR gates.")
 
     # ------------------------------------------------------------------------------
     # fifth iteration merges all first stage OR gates down to a single 'root'
-    # and connect as output
+    # OR gate and connect them to the output buffers
+    log.info("")
+    log.info("Merges all first stage OR gates down to a single 'root' OR gate and connect them to the output buffers")
     max_or_gate_stages = 0
     for output in logic:
+        log.info(f"Performing the merges of all OR gates for output {output}")
+
         final_or_gate_for_output = None
 
         terminate_current_or_gate()
@@ -587,39 +618,46 @@ if __name__ == '__main__':
 
         if not hasattr(input_gates_for_stage, "__len__"):
             input_gates_for_stage = [ input_gates_for_stage ]
+            log.warning("input_gates_for_stage is scalar but that should already be handled correctly")
 
-        while True:
-            output_or_gates_for_stage = []
+        log.info(f"Number of OR gates to be merged: {len(input_gates_for_stage)}, i.e. {input_gates_for_stage}")
 
-            for input_gate_for_stage in input_gates_for_stage:
-                (or_gate_idx, or_gate_port_idx, or_gate_port_name) = allocate_next_free_or_gate_inport()
-                #log.info(f"Allocated OR gate {or_gate_idx}")
+        if len(input_gates_for_stage) == 1:
+            log.info("Only single OR gate, therefore directly connect it to the output buffer")
+            final_or_gate_for_output = input_gates_for_stage[0]
+        else:
+            while True:
+                output_or_gates_for_stage = []
 
-                #if or_gate_port_idx == 0:
-                #    get_part_by_id(f"gate_or_{and_gate_idx}")["left"] += depth * wokwi_gate_spacing_h
+                for input_gate_for_stage in input_gates_for_stage:
+                    (or_gate_idx, or_gate_port_idx, or_gate_port_name) = allocate_next_free_or_gate_inport()
+                    #log.info(f"Allocated OR gate {or_gate_idx}")
 
-                # put OR gate in a list as reminder to work on them later
-                output_or_gates_for_stage.append(or_gate_idx)
+                    #if or_gate_port_idx == 0:
+                    #    get_part_by_id(f"gate_or_{and_gate_idx}")["left"] += depth * wokwi_gate_spacing_h
 
-                # connect previous OR gate's output to current OR gate's input port
-                con = [ f"gate_or_{input_gate_for_stage}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
-                        con_color_or_or_interconnect, default_con_instr ]
-                log.debug("    Connection: "+str(con))
-                wokwi_design["connections"].append(con)
+                    # put OR gate in a list as reminder to work on them later
+                    output_or_gates_for_stage.append(or_gate_idx)
 
-            # remove duplicates
-            output_or_gates_for_stage = list(set(output_or_gates_for_stage))
+                    # connect previous OR gate's output to current OR gate's input port
+                    con = [ f"gate_or_{input_gate_for_stage}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
+                            con_color_or_or_interconnect, default_con_instr ]
+                    log.debug("    Connection: "+str(con))
+                    wokwi_design["connections"].append(con)
 
-            if len(output_or_gates_for_stage) == 1:
-                log.debug(f"  Merged to single OR gate: {output_or_gates_for_stage}")
-                final_or_gate_for_output = output_or_gates_for_stage[0]
-                break
-            else:
-                log.debug(f"  Still having more than one OR gate left: {output_or_gates_for_stage}, turning another round")
-                terminate_current_and_gate()
-                depth += 1 # turn another round and keep track of depth for the layout
-                max_or_gate_stages = max(max_or_gate_stages, depth)
-                input_gates_for_stage = output_or_gates_for_stage # output of this round is input for next round
+                # remove duplicates
+                output_or_gates_for_stage = list(set(output_or_gates_for_stage))
+
+                if len(output_or_gates_for_stage) == 1:
+                    log.debug(f"  Merged to single OR gate: {output_or_gates_for_stage}")
+                    final_or_gate_for_output = output_or_gates_for_stage[0]
+                    break
+                else:
+                    log.debug(f"  Still having more than one OR gate left: {output_or_gates_for_stage}, turning another round")
+                    terminate_current_and_gate()
+                    depth += 1 # turn another round and keep track of depth for the layout
+                    max_or_gate_stages = max(max_or_gate_stages, depth)
+                    input_gates_for_stage = output_or_gates_for_stage # output of this round is input for next round
 
         log.info(f"Identified #{final_or_gate_for_output} as final OR gate for the output {output} to be connected to output buffer")
 
@@ -633,7 +671,7 @@ if __name__ == '__main__':
         wokwi_design["connections"].append(con)
 
     log.info(f"Max AND gate stages: {num_and_stages_max_overall}")
-    log.info(f"Max OR gate stages: {max_or_gate_stages}")
+    log.info(f"Max  OR gate stages: {max_or_gate_stages}")
 
     # OR gates
     for k in range(global_or_gate_idx+1):
