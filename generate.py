@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-import qm
 import json
 import math
 import pandas
 import textwrap
 import coloredlogs, logging
+from quine_mccluskey import qm
 from argparse import ArgumentParser
-# pandas and textwrap are only used for visualization of the logic table
 
 # Copyright (c) maehw, 2022
 # wokwi-lookup-table-generator is licensed under the GNU General Public License v3.0

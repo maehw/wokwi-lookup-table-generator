@@ -1,0 +1,13 @@
+# Requirements without version specifiers
+# ------------------------------------------------------------------------------
+pandas
+coloredlogs
+quine-mccluskey
+argparse
+
+# Note:
+# - pandas and textwrap are only used for visualization of the logic table;
+#   there's no strong dependency on them!
+# - the following packages don't need to be mentioned here:
+#   json, math, textwrap, logging
+#   (or I may be missing something)

@@ -9,21 +9,21 @@ This project is WIP. Feel free to contribute, open issues, etc.
 
 ## Installation and dependencies
 
+Resolve all requirements using `pip3`:
+
+```
+pip3 install -r requirements.txt
+```
+
 This project depends on the package `quine-mccluskey` a [Python implementation of the Quine McCluskey algorithm](https://pypi.org/project/quine-mccluskey/).
 
 The author says:
 
 > This implementation of the Quine McCluskey algorithm has no inherent limits (other than the calculation time) on the size of the inputs.
 
-I had problems installing the package with pip.
+> **Warning**
+> The Quine McCluskey algorithm currently does not give deterministic results. An issue has been opened [here](https://github.com/tpircher/quine-mccluskey/issues/8).
 
-`pip3 install quine-mccluskey` installs it, but is cannot be found when importing it. Does anybody know why?
-
-The module can be found inside `/usr/local/lib/python3.10/site-packages/quine_mccluskey` on my machine (`pip3 list -v`).
-So the current workaround is to move the Python script there and execute it from there (ugly, true).
-
-
-TODO: Move dependencies into `requirements.txt` and resolve them correctly.
 
 ## TODOs
 
