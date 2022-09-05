@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "description": "4-bit popcount; inspired by https://wokwi.com/projects/340285391309374034 and https://vaibhavsagar.com/blog/2019/09/08/popcount/",
+  "inputs": ["a", "b", "c", "d"],
+  "outputs": {
+    "A": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    "B": [0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
+    "C": [0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0]
+  }
+}

@@ -81,9 +81,12 @@ The author says:
 
 ## Demo designs
 
-* 2-bit half adder (is not fully working yet)
-* 2-bit full adder (is not fully working yet)
+* `2bit_half_adder.logic.json`: 2-bit half adder (is not fully working yet)
+* `2bit_full_adder.logic.json`: 2-bit full adder (is not fully working yet)
+* `limited-ascii_7segment_lut.logic.json`: limited ASCII character range to 7-segment Wokwi display (is not fully working yet?)
+* `4bit-popcount.json`: 4-bit popcount (makes the generator hang up)
 
+For descriptions of the demo designs, inspect their JSON files.
 
 ## Termination of unsed gate inputs
 
