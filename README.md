@@ -102,7 +102,7 @@ The author says:
 
 * `2bit_half_adder.logic.json`: 2-bit half adder ([Wokwi demo project](https://wokwi.com/projects/341979369318646355))
 * `2bit_full_adder.logic.json`: 2-bit full adder ([Wokwi demo project](https://wokwi.com/projects/341985679348073043))
-* `limited-ascii_7segment_lut.logic.json`: limited ASCII character range to 7-segment Wokwi display (is not fully working yet?)
+* `limited-ascii_7segment_lut.logic.json`: limited ASCII character range to 7-segment Wokwi display ([Wokwi demo project](https://wokwi.com/projects/341987347359859282))
 * `4bit-popcount.json`: 4-bit popcount (makes the generator hang up)
 
 For descriptions of the demo designs, inspect their JSON files.
