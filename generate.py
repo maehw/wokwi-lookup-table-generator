@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import json
 import math
-import pandas
-import textwrap
 import coloredlogs, logging
 from quine_mccluskey import qm
 from argparse import ArgumentParser
@@ -75,60 +73,11 @@ if __name__ == '__main__':
         "attrs": {}
     }
 
-    wokwi_gate_spacing_v = 60
-    wokwi_gate_spacing_h = 120
-
-    # ------------------------------------------------------------------------------
-    # user specific design definition
-
-    # the 'logic' dictionary defines the
-    # - names of the output variables
-    # - the list of integers that describe the input combination (row index of the truth table) when the output function is '1'
-    # note: the order of key-value entries inside the dictionary is not relevant
-
-    seven_segment_design = True
-    seven_segment_design_full = True
-
-    adder_design = False #True
-
-    smol_design = False
-
-    if seven_segment_design:
-        if seven_segment_design_full:
-            # full version (5 bit ASCII subset to 7 segment wokwi display)
-            input_names  = ['a', 'b', 'c', 'd', 'e']
-            logic = {
-                'A': [0, 1, 5, 6, 7, 11, 13, 15, 16, 17, 19, 26, 27, 29, 30],
-                'B': [0, 1, 4, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 29],
-                'C': [0, 1, 2, 4, 7, 8, 10, 11, 13, 14, 15, 17, 19, 21, 24, 25, 28, 29],
-                'D': [0, 2, 3, 4, 5, 7, 10, 12, 15, 19, 20, 21, 22, 23, 25, 26, 27, 29, 31],
-                'E': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 21, 24, 26, 27],
-                'F': [1, 2, 5, 6, 7, 8, 9, 11, 12, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 27, 28],
-                'G': [0, 1, 2, 3, 4, 5, 6, 8, 11, 14, 16, 17, 18, 19, 20, 23, 24, 25],
-            }
-        else:
-            # reduced version (5 bit ASCII subset to 7 segment wokwi display)
-            input_names  = ['a', 'b', 'c', 'd', 'e']
-            logic = {
-                'A': [0, 1, 5, 6, 7, 11, 13, 15, 16, 17, 19, 26, 27, 29, 30],
-                'B': [0, 1, 4, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 29],
-                'C': [0, 1, 2, 4, 7, 8, 10, 11, 13, 14, 15, 17, 19, 21, 24, 25, 28, 29],
-            }
-    if adder_design:
-        input_names  = ['a', 'b']
-        logic = {
-            'S': [1, 2],
-            'C': [3],
-        }
-    if smol_design:
-        input_names  = ['a', 'b']
-        logic = {
-            'X': [2, 3],
-            'Y': [1, 3],
-        }
-
     # ------------------------------------------------------------------------------
     # user specific output style and laoyut definition
+
+    wokwi_gate_spacing_v = 60
+    wokwi_gate_spacing_h = 120
 
     sym_negation = '~' # could also be 'NOT '
     sym_and = '' # could also be ' AND ' / '*'
@@ -269,26 +218,46 @@ if __name__ == '__main__':
         return retval
 
 
+    log.info(f"Log level: {log_level}")
+
     # ------------------------------------------------------------------------------
     # generate insights about the design input data, i.e. log them to the console
+    # ------------------------------------------------------------------------------
+    # user specific design definition
 
-    output_names = list( logic.keys() )
+    # - asume no duplicate names in use
+    # - asume order of output values (zeros and ones) matches binary input order
+    #   (e.g. for three inputs: 000, 001, 010, 011, 100, ..., 110, 111)
+    # - make input names optional (and use default ones, e.g. 'a', 'b', 'c', ...)
+
+    in_filename = "logic.json"
+    in_data = {}
+    with open(in_filename, 'r') as f:
+        in_data = json.loads( f.read() )
+        log.info(f"Data is read from input file '{in_filename}'" )
+
+    # the 'logic' dictionary used within this script defines the
+    # - names of the output variables
+    # - the list of integers that describe the input combination (row index of the truth table) when the output function is '1'
+    # note: the order of key-value entries inside the dictionary is not relevant
+    logic = {}
+
+    input_names = in_data["inputs"]
     num_inputs = len(input_names)
+    output_names = list( in_data["outputs"].keys() )
     num_outputs = len(output_names)
 
-    log.info(f"Log level: {log_level}")
     log.info(f"Inputs:    {num_inputs:2} {input_names}")
     log.info(f"Outputs:   {num_outputs:2} {output_names}")
 
+    for output in output_names:
+        assert len(in_data["outputs"][output]) == 2**num_inputs
+        ones = [i for i in range(2**num_inputs) if in_data["outputs"][output][i] == 1]
+        log.info(f"  Output {output}: {in_data['outputs'][output]}; ones: {ones}")
+        logic[output] = ones;
+
     max_ones_idx = 2**num_inputs - 1
     log.debug(f"Max ones idx: 2^{num_inputs} - 1 = {max_ones_idx}")
-
-    log.info("Logic:")
-    df = pandas.DataFrame.from_dict(logic, orient='index')
-    pandas.options.display.float_format = '{:,.0f}'.format # we only have true ints, no need for decimals
-    df = df.fillna("") # don't show NaNs
-    df = df.rename(columns={col: "" for col in df}) # hide header
-    log.info(textwrap.indent(df.to_string(), f"{' '*23}")) # align with previous log outputs
 
     log.debug("Wokwi design (at start):")
     log.debug(wokwi_design)
