@@ -12,29 +12,6 @@ from argparse import ArgumentParser
 # wokwi-lookup-table-generator is licensed under the GNU General Public License v3.0
 # Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
 
-# qm is inside /usr/local/lib/python3.10/site-packages/quine_mccluskey
-# `pip3 install quine-mccluskey` installs it, but is cannot be found; why?
-
-# TODOs:
-# - document limitations
-# - add assertions
-# - make log level configurable
-# - use a more object-oriented approach for everything
-# - implement interactive mode
-# - allow configuration data to be fed in as an external file
-# - perform sanity checks to see if all parts are connected,
-#   some may be unused due to bugs (probably rounding)
-# - fix termination of gates
-
-# side note: there are basically two termination strategies:
-# - the unused input pin of a 2 input AND gate can
-#   a) either be pulled HIGH or
-#   b) be connected to the other input
-# - the unused input pin of a 2 input OR gate can
-#   a) either be pulled LOW or
-#   b) be connected to the other input
-# in the past I've used method a) which takes more effort
-
 if __name__ == '__main__':
     parser = ArgumentParser(description='%(prog)s')
 
