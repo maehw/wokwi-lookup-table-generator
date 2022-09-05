@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "description": "Logic that adds two numbers and a carry bit and produces a sum bit (S) and carry out bit (C). The design is also called full adder.",
+  "inputs": ["a", "b", "c"],
+  "outputs": {
+    "S": [0, 1, 1, 0, 1, 0, 0, 1],
+    "C": [0, 0, 0, 1, 0, 1, 1, 1]
+  }
+}

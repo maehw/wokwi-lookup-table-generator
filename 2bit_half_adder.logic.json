@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "description": "Logic that adds two numbers and produces a sum bit (S) and carry bit (C). The design is also called half adder.",
   "inputs": ["a", "b"],
   "outputs": {
     "S": [0, 1, 1, 0],

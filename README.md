@@ -79,9 +79,10 @@ The author says:
   some may be unused due to bugs (probably rounding)
 
 
-## Limitations
+## Demo designs
 
-TBD
+* 2-bit half adder (is not fully working yet)
+* 2-bit full adder (is not fully working yet)
 
 
 ## Termination of unsed gate inputs

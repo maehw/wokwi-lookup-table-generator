@@ -168,8 +168,6 @@ if __name__ == '__main__':
                 wokwi_design["connections"].append(con)
                 log.debug("      Connection: "+str(con))
                 global_and_gate_used_inports = 2
-        else:
-            log.warning("Not terminating AND gate yet, as no gate active.")
 
     def terminate_current_or_gate():
         global global_or_gate_idx
@@ -184,8 +182,6 @@ if __name__ == '__main__':
                 wokwi_design["connections"].append(con)
                 log.debug("      Connection: "+str(con))
                 global_or_gate_used_inports = 2
-        else:
-            log.warning("Not terminating OR gate yet, as no gate active.")
 
     def switch_to_next_or_gate():
         global global_or_gate_idx
