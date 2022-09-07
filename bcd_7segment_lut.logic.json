@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Lookup table to translate a limited set of ASCII characters to wokwi 7-segment display (https://docs.wokwi.com/parts/wokwi-7segment). The most significant bits of the ASCII character are fixed to 0b010 (asuming 8-bit characters). This results in usable characters encodings being 0b010X'XXXX, i.e. between 0b0100'0000 (=0x40) and 0b0101'1111 (=0x5F). This range covers the capital letters A..Z, and some special printable characters. Please note that the dot segment of the 7 segment display is not used.",
-  "inputs": ["a", "b", "c", "d", "e"],
+  "inputs": ["a", "b", "c", "d"],
   "outputs": {
     "A": [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
     "B": [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
