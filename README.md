@@ -1,10 +1,15 @@
 # wokwi lookup table generator
 
-Generator for wokwi schematics that implement lookup tables in conjunctive normal form (CNF), i.e. with AND and OR gates.
+This git repository contains a **generator for wokwi schematics that implement lookup tables in conjunctive normal form (CNF)**, i.e. with AND and OR gates. (Detailed explanation what this means and how it is done will follow.)
 
 This project is written in Python3.
 
-This project is WIP. Feel free to contribute, open issues, etc.
+> **Note**
+> This project is work in progress. It is known that not all designs are generated correctly, so there are still some bugs.
+
+
+Feel free to contribute, open issues, etc.
+To contribute to the project, fork this GitHub repository and create a pull request. Detailed instructions can be found at https://docs.github.com/en/get-started/quickstart/contributing-to-projects. I'll be happy to review the code diff and eventually merge it into the original repo here.
 
 
 ## Usage
