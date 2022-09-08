@@ -10,8 +10,7 @@ This project is WIP. Feel free to contribute, open issues, etc.
 ## Usage
 
 ```
-$ python3 generate.py -h
-usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE]
+$ usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE] [-p | --parts_only | --no-parts_only] [-c | --connections_only | --no-connections_only]
 
 generate.py is a lookup table generator tool for wokwi
 
@@ -22,6 +21,10 @@ options:
                         path to JSON logic input file; if none is given, stdout is used (default: logic.json)
   -o OUT_FILE, --outfile OUT_FILE
                         path to generated wokwi schematic file (default: None)
+  -p, --parts_only, --no-parts_only
+                        dump wokwi parts list only (default: 0)
+  -c, --connections_only, --no-connections_only
+                        dump wokwi connections list only (default: 0)
 ```
 
 Examples:
@@ -48,6 +51,14 @@ Specify an output file for the wokwi schematic externally but also show contents
 
 ```
 python3 generate.py -f 2bit_half_adder.logic.json | tee 2bit_half_adder.diagram.json
+```
+
+Switches `-p` and `-c` allow to limit the dump to wokwi parts ony respectively wokwi connections only.
+
+This feature can be used to modify existing designs only. The following command can be used on Mac OS X to **copy** the parts of the design into the **p**aste **b**uffer:
+
+```
+python3 generate.py -f bcd_7segment_lut.logic.json -p | sed 's/[{}]//' | pbcopy
 ```
 
 

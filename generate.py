@@ -3,7 +3,7 @@ import json
 import math
 import coloredlogs, logging
 from quine_mccluskey import qm
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, BooleanOptionalAction
 
 # Copyright (c) maehw, 2022
 # wokwi-lookup-table-generator is licensed under the GNU General Public License v3.0
@@ -27,6 +27,16 @@ if __name__ == '__main__':
                         dest='out_file',
                         help='path to generated wokwi schematic file',
                         default=None)
+
+    parser.add_argument('-p', '--parts_only',
+                       action=BooleanOptionalAction,
+                       help='dump wokwi parts list only',
+                       default=0)
+
+    parser.add_argument('-c', '--connections_only',
+                        action=BooleanOptionalAction,
+                        help='dump wokwi connections list only',
+                        default=0)
 
     args = parser.parse_args()
 
@@ -229,6 +239,9 @@ if __name__ == '__main__':
 
 
     log.info(f"Log level: {log_level}")
+
+    if args.parts_only and args.connections_only:
+        parser.error("Combination of -p and -c is currently not supported.")
 
     # ------------------------------------------------------------------------------
     # generate insights about the design input data, i.e. log them to the console
@@ -697,10 +710,20 @@ if __name__ == '__main__':
 
     #log.debug( json.dumps(logic_meta, indent=4) )
 
+    wokwi_design_dump = wokwi_design
+
+    # limit the dump; mutual exclusion of both options has been guaranteed earlier
+    if args.parts_only:
+        log.info("Only dumping wokwi parts.")
+        wokwi_design_dump = wokwi_design["parts"]
+    elif args.connections_only:
+        log.info("Only dumping wokwi connections.")
+        wokwi_design_dump = wokwi_design["connections"]
+
     if args.out_file:
         log.info(f"Writing final wokwi design file '{args.out_file}'...")
         with open(args.out_file, 'w') as f:
-            json.dump(wokwi_design, f, indent=4)
+            json.dump(wokwi_design_dump, f, indent=4)
     else:
         log.info("Dumping final wokwi design to stdout...")
-        print( json.dumps(wokwi_design, indent=4) )
+        print( json.dumps(wokwi_design_dump, indent=4) )
