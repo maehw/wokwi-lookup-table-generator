@@ -8,7 +8,7 @@ This project is written in Python3.
 > This project is work in progress. It is known that not all designs are generated correctly, so there are still some bugs.
 
 
-Feel free to contribute, open issues, etc.
+Feel free to contribute, open issues, [work on existing issues](https://github.com/maehw/wokwi-lookup-table-generator/issues), etc.
 To contribute to the project, fork this GitHub repository and create a pull request. Detailed instructions can be found at https://docs.github.com/en/get-started/quickstart/contributing-to-projects. I'll be happy to review the code diff and eventually merge it into the original repo here.
 
 
@@ -37,25 +37,25 @@ Examples:
 Only specifying the input file name, will dump the wokwi schematic via `stdout`:
 
 ```
-python3 generate.py -f 2bit_half_adder.logic.json
+python3 generate.py -f ./demos/2bit_half_adder.logic.json
 ```
 
 Only specifying the input file name, will dump the wokwi schematic via `stdout` (piped to `/dev/null`), log level `DEBUG`:
 
 ```
-python3 generate.py -f 2bit_half_adder.logic.json -vv > /dev/null
+python3 generate.py -f ./demos/2bit_half_adder.logic.json -vv > /dev/null
 ```
 
 Specify an output file for the wokwi schematic:
 
 ```
-python3 generate.py -f 2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json
+python3 generate.py -f ./demos/2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json
 ```
 
 Specify an output file for the wokwi schematic externally but also show contents on `stdout` by [piping it through `tee`](https://en.wikipedia.org/wiki/Tee_(command)):
 
 ```
-python3 generate.py -f 2bit_half_adder.logic.json | tee 2bit_half_adder.diagram.json
+python3 generate.py -f ./demos/2bit_half_adder.logic.json | tee 2bit_half_adder.diagram.json
 ```
 
 Switches `-p` and `-c` allow to limit the dump to wokwi parts ony respectively wokwi connections only.
@@ -63,7 +63,7 @@ Switches `-p` and `-c` allow to limit the dump to wokwi parts ony respectively w
 This feature can be used to modify existing designs only. The following command can be used on Mac OS X to **copy** the parts of the design into the **p**aste **b**uffer:
 
 ```
-python3 generate.py -f bcd_7segment_lut.logic.json -p | sed 's/[{}]//' | pbcopy
+python3 generate.py -f ./demos/bcd_7segment_lut.logic.json -p | sed 's/[{}]//' | pbcopy
 ```
 
 
@@ -113,10 +113,12 @@ The author says:
 - perform sanity checks to see if all parts are connected,
   some may be unused due to bugs (probably rounding)
 
+Some TODOs or ideas are already visible in the [issues tab](https://github.com/maehw/wokwi-lookup-table-generator/issues). Especially have a look at the issues labeled `good first issue` and `help wanted`.
+
 
 ## Demo designs
 
-For descriptions of the demo designs, inspect their JSON files.
+For descriptions of the demo designs, inspect their JSON files in the `./demos` subdirectory of this repo.
 
 > **Warning**
 > The Quine McCluskey algorithm currently does not give deterministic results. An issue has been opened [here](https://github.com/tpircher/quine-mccluskey/issues/8).
