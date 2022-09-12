@@ -131,10 +131,10 @@ Some demos are working, some seem to cause trouble.
 
 * [`2bit_or.logic.json`](./demos/2bit_or.logic.json): 2-bit OR ([Wokwi demo project](https://wokwi.com/projects/341992743611925075)); (as simple as an OR gate, but generated using a truth table)
 
+* [`limited-ascii_7segment_lut.logic.json`](./demos/limited-ascii_7segment_lut.logic.json): limited ASCII character range to 7-segment Wokwi display; ([basic Wokwi demo project](https://wokwi.com/projects/341987347359859282), [advanced Wokwi demo project](https://wokwi.com/projects/342600282267451988) cycling through the character set with an Arduino and showing the outputs on a common cathose 7-segment display)
+
 
 ### Non-working demos
-
-* [`limited-ascii_7segment_lut.logic.json`](./demos/limited-ascii_7segment_lut.logic.json): limited ASCII character range to 7-segment Wokwi display; ([basic Wokwi demo project](https://wokwi.com/projects/341987347359859282), [advanced Wokwi demo project](https://wokwi.com/projects/341989925253546578) cycling through the character set with an Arduino disclosing encoding errors)
 
 * [`4bit-popcount.json`](./demos/4bit-popcount.json): 4-bit popcount (makes the generator hang up)
 
