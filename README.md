@@ -1,12 +1,20 @@
-# wokwi lookup table generator
+# Wokwi lookup table (LUT) generator
 
-This git repository contains a **generator for wokwi schematics that implement lookup tables in conjunctive normal form (CNF)**, i.e. with AND and OR gates. (Detailed explanation what this means and how it is done will follow.)
+## What is this all about?
 
-This project is written in Python3.
+This git repository contains a **generator for [wokwi](https://wokwi.com) schematics that implement lookup tables** (defined by a truth table and some more meta data in a JSON file, see the [./demos](demos) subdirectory.
+
+But what is wokwi? Wokwi is a free, browser-based simulator that supports different Arduino and several other boards and components (such as LEDs, buttons, switches, sensors, ...). It also has been used during [#TinyTapeout](https://tinytapeout.com) in August/September 2022 - an educational project that "aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip". So oversimplified you can also easily simulate and generate ASIC designs - from a very simple boolean algebra design description (truth tables).
+
+How does this work internally? See a separate section below the "Usage" section
+
+Language: This project is written in Python3.
 
 > **Note**
 > This project is work in progress. It is known that not all designs are generated correctly, so there are still some bugs.
 
+
+## Contribution
 
 Feel free to contribute, open issues, [work on existing issues](https://github.com/maehw/wokwi-lookup-table-generator/issues), etc.
 To contribute to the project, fork this GitHub repository and create a pull request. Detailed instructions can be found at https://docs.github.com/en/get-started/quickstart/contributing-to-projects. I'll be happy to review the code diff and eventually merge it into the original repo here.
@@ -104,18 +112,6 @@ The author says:
 > The Quine McCluskey algorithm currently does not give deterministic results. An issue has been opened [here](https://github.com/tpircher/quine-mccluskey/issues/8).
 
 
-## TODOs
-
-- document limitations
-- add assertions
-- use a more object-oriented approach for everything
-- implement interactive mode
-- perform sanity checks to see if all parts are connected,
-  some may be unused due to bugs (probably rounding)
-
-Some TODOs or ideas are already visible in the [issues tab](https://github.com/maehw/wokwi-lookup-table-generator/issues). Especially have a look at the issues labeled `good first issue` and `help wanted`.
-
-
 ## Demo designs
 
 For descriptions of the demo designs, inspect their JSON files in the `./demos` subdirectory of this repo.
@@ -159,3 +155,72 @@ The unused input pin of a 2 input *OR* gate can
 
 In the past I had used the first approach which takes more effort (adding a GND and a VCC block and adding connections to it).
 I've switch to the second approach as this can be realized by adding a short wire connection from one inport to the other - and it's generic for AND and OR gates.
+
+
+## How does this work internally?
+
+The generator is fed with a truth table describing the boolean algebra to be implemented.
+
+The generator implements the lookup tables (truth tables) in conjunctive normal form (CNF)**, i.e. with AND and OR gates.
+
+Let's have a look at the example of a 2-bit half adder: "Logic that adds two numbers and produces a sum bit (S) and carry bit (C)."
+
+The truth table looks as follows (`a` and `b` are inputs, `S` (sum) and `C` (carry) are outputs):
+
+| a | b | S | C |
+|---|---|---|---|
+| 0 | 0 | 0 | 0 |
+| 0 | 1 | 1 | 0 |
+| 1 | 0 | 1 | 0 |
+| 1 | 1 | 0 | 1 |
+
+This can also be written as equations with functions of boolean algebra (using so called minterms):
+
+```
+S = ~a*b + a*~b
+C = a*b
+```
+
+where 
+
+* `~` represents inversion (a `NOT` gate),
+* `*` represents a logical `AND`(an `AND` gate),
+* `+` represents a logical `OR` an `OR` gate).
+
+That also explains the term "sum of products" (SOP).
+
+
+For better readability the `*` are often omitted, leaving us with:
+
+```
+S = ~ab + a~b
+C = ab
+```
+
+The conversion from truth table to boolean algebra is done with a [Python implementation of the Quine McCluskey algorithm](https://pypi.org/project/quine-mccluskey/). Please note that these optimizations are not really required as the ASIC toolchain will take care of optimization (and know the kind of hardware cells being available on the target hardware), but it helps to understand own digital designs and their implementation.
+
+The algorithm basically performs the following steps (be careful as this concept image does not match the previously used example):
+
+![concept](https://user-images.githubusercontent.com/6305922/189659328-9eaca4a9-6210-4447-bb89-966fe479e801.png)
+
+* Insert buffers for the inputs and `NOT` gates for the inverted inputs (green step)
+* Insert `AND` gates and connect pairs of inputs to those `AND` gates (make products of two multiplicands; first yellow step)
+* Insert more `AND` gates and connect them so that a single product ends with one final `AND` gate to get a summand for the additional stage (second yellow step)
+* Insert `OR` gates and connect pairs of inputs to those `OR` gates (make sums of two summands; first blue step)
+* Insert more `OR` gates and connect them so that a single sum ends with one final `OR` gate to get the final output for the boolean algebraic function
+
+
+Further read: [Département d'informatique et de recherche opérationnelle - Université de Montréal: LOGIC SYNTHESIS AND TWO LEVEL LOGIC OPTIMIZATION](http://www.iro.umontreal.ca/~dift6221/demicheli4/twolevel1.4.ps.pdf)
+
+
+## TODOs
+
+- document limitations
+- add assertions
+- use a more object-oriented approach for everything
+- implement interactive mode
+- perform sanity checks to see if all parts are connected,
+  some may be unused due to bugs (probably rounding)
+
+Some TODOs or ideas are already visible in the [issues tab](https://github.com/maehw/wokwi-lookup-table-generator/issues). Especially have a look at the issues labeled `good first issue` and `help wanted`.
+
