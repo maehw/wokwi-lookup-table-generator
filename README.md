@@ -127,20 +127,20 @@ Some demos are working, some seem to cause trouble.
 
 ### Working demos
 
-* [`2bit_half_adder.logic.json`](2bit_half_adder.logic.json): 2-bit half adder; ([Wokwi demo project](https://wokwi.com/projects/341979369318646355))
+* [`2bit_half_adder.logic.json`](./demos/2bit_half_adder.logic.json): 2-bit half adder; ([Wokwi demo project](https://wokwi.com/projects/341979369318646355))
 
-* [`2bit_full_adder.logic.json`](2bit_full_adder.logic.json): 2-bit full adder; ([Wokwi demo project](https://wokwi.com/projects/341985679348073043))
+* [`2bit_full_adder.logic.json`](./demos/2bit_full_adder.logic.json): 2-bit full adder; ([Wokwi demo project](https://wokwi.com/projects/341985679348073043))
 
-* [`2bit_and.logic.json`](2bit_and.logic.json): 2-bit AND ([Wokwi demo project](https://wokwi.com/projects/341992203508253267)); (as simple as an AND gate, but generated using a truth table)
+* [`2bit_and.logic.json`](./demos/2bit_and.logic.json): 2-bit AND ([Wokwi demo project](https://wokwi.com/projects/341992203508253267)); (as simple as an AND gate, but generated using a truth table)
 
-* [`2bit_or.logic.json`](2bit_or.logic.json): 2-bit OR ([Wokwi demo project](https://wokwi.com/projects/341992743611925075)); (as simple as an OR gate, but generated using a truth table)
+* [`2bit_or.logic.json`](./demos/2bit_or.logic.json): 2-bit OR ([Wokwi demo project](https://wokwi.com/projects/341992743611925075)); (as simple as an OR gate, but generated using a truth table)
 
 
 ### Non-working demos
 
-* [`limited-ascii_7segment_lut.logic.json`](limited-ascii_7segment_lut.logic.json): limited ASCII character range to 7-segment Wokwi display; ([basic Wokwi demo project](https://wokwi.com/projects/341987347359859282), [advanced Wokwi demo project](https://wokwi.com/projects/341989925253546578) cycling through the character set with an Arduino disclosing encoding errors)
+* [`limited-ascii_7segment_lut.logic.json`](./demos/limited-ascii_7segment_lut.logic.json): limited ASCII character range to 7-segment Wokwi display; ([basic Wokwi demo project](https://wokwi.com/projects/341987347359859282), [advanced Wokwi demo project](https://wokwi.com/projects/341989925253546578) cycling through the character set with an Arduino disclosing encoding errors)
 
-* [`4bit-popcount.json`](4bit-popcount.json): 4-bit popcount (makes the generator hang up)
+* [`4bit-popcount.json`](./demos/4bit-popcount.json): 4-bit popcount (makes the generator hang up)
 
 
 ## Termination of unsed gate inputs
