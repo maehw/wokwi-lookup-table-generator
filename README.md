@@ -74,6 +74,12 @@ This feature can be used to modify existing designs only. The following command 
 python3 generate.py -f ./demos/bcd_7segment_lut.logic.json -p | sed 's/[{}]//' | pbcopy
 ```
 
+Specify an output file for the wokwi schematic; also generate an Arduino sketch for automated verification and add and connect an Arduino MEGA in the wokwi schematic:
+
+```
+python3 generate.py -f ./demos/2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json -t
+```
+
 
 After having generated your diagram JSON file, ...
 
@@ -181,7 +187,7 @@ S = ~a*b + a*~b
 C = a*b
 ```
 
-where 
+where
 
 * `~` represents inversion (a `NOT` gate),
 * `*` represents a logical `AND`(an `AND` gate),
@@ -223,4 +229,3 @@ Further read: [Département d'informatique et de recherche opérationnelle - Uni
   some may be unused due to bugs (probably rounding)
 
 Some TODOs or ideas are already visible in the [issues tab](https://github.com/maehw/wokwi-lookup-table-generator/issues). Especially have a look at the issues labeled `good first issue` and `help wanted`.
-

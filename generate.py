@@ -2,6 +2,7 @@
 import json
 import math
 import coloredlogs, logging
+from os import linesep
 from quine_mccluskey import qm
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, BooleanOptionalAction
 
@@ -37,6 +38,11 @@ if __name__ == '__main__':
                         action=BooleanOptionalAction,
                         help='dump wokwi connections list only',
                         default=0)
+
+    parser.add_argument('-t', '--test',
+                       action=BooleanOptionalAction,
+                       help='add an Arduino MEGA as test framework and generate Arduino verification code',
+                       default=0)
 
     args = parser.parse_args()
 
@@ -97,6 +103,15 @@ if __name__ == '__main__':
         "attrs": {}
     }
 
+    wokwi_arduino_mega = {
+        "type": "wokwi-arduino-mega",
+        "id": "mega",
+        "top": -400,
+        "left": -500,
+        "rotate": 90,
+        "attrs": {}
+   }
+
     # ------------------------------------------------------------------------------
     # user specific output style and laoyut definition
 
@@ -122,6 +137,9 @@ if __name__ == '__main__':
     con_color_or_or_interconnect = "green"
     con_color_or_output = "cyan"
     con_color_termination = "black"
+    con_color_arduino_interconnect = "black"
+
+    arduino_sketch_template_file = "sketch.ino.template"
 
     global global_and_gate_idx
     global_and_gate_idx = -1
@@ -237,6 +255,18 @@ if __name__ == '__main__':
 
         return retval
 
+    def get_expected_bin_out_vals(output_names, output_data, num_inputs):
+        # create binary based expectation values for Arduino verification code
+        # see also: https://www.arduino.cc/reference/en/language/variables/constants/integerconstants/
+        expected_bin_val = ""
+        for k in range(2**num_inputs):
+            expected_bin_val += linesep + "    0b"
+            for output in output_names:
+                expected_bin_val += str(output_data[output][k])
+            expected_bin_val += ","
+
+        return expected_bin_val
+
 
     log.info(f"Log level: {log_level}")
 
@@ -277,6 +307,7 @@ if __name__ == '__main__':
     log.info(f"Outputs:   {num_outputs:2} {output_names}")
 
     for output in output_names:
+        # make sure that we have 2^num_inputs output values!
         assert len(in_data["outputs"][output]) == 2**num_inputs
         ones = [i for i in range(2**num_inputs) if in_data["outputs"][output][i] == 1]
         log.info(f"  Output {output}: {in_data['outputs'][output]}; ones: {ones}")
@@ -707,6 +738,64 @@ if __name__ == '__main__':
     log.debug("Added output buffer parts to the wokwi design")
 
     log.info(f"Finished the wokwi design!")
+
+
+    if args.test:
+        log.info("Generating verification code and test framework")
+        arduino_sketch_template = None
+        with open(arduino_sketch_template_file, 'r') as f:
+            arduino_sketch = f.read()
+        if arduino_sketch:
+            # generate the code, then add parts and connections to the wokwi schematic
+
+            # replace the placeholders with actual values
+            arduino_sketch = arduino_sketch.replace("{DESIGN_NUM_USED_INPUTS_PH}", f"{num_inputs}u")
+            arduino_sketch = arduino_sketch.replace("{DESIGN_NUM_USED_OUTPUTS_PH}", f"{num_outputs}u")
+            expected_bin_out_vals = get_expected_bin_out_vals(output_names, in_data["outputs"], num_inputs)
+            arduino_sketch = arduino_sketch.replace("{VERIFICATION_EXPECTED_OUT_VALS_PH}", expected_bin_out_vals)
+
+            # TODO: allow to use non-constant values for placeholders by controlling the from the
+            #       Python generator (e.g. by adding command line arguments)
+            arduino_sketch = arduino_sketch.replace("{VERIFICATION_STOP_ON_ERROR}", "true")
+            arduino_sketch = arduino_sketch.replace("{SERIAL_BAUDRATE_PH}", "230400u")
+            arduino_sketch = arduino_sketch.replace("{VERIFICATION_SETUP_TIME_MS_PH}", "50u")
+            arduino_sketch = arduino_sketch.replace("{VERIFICATION_HOLD_TIME_MS_PH}", "350u")
+
+            # save the generated Arduino sketch
+            with open("sketch.ino", 'w') as f:
+                f.write(arduino_sketch)
+
+            # add the Arduino MEGA to the wokwi schematic's parts list
+            wokwi_design["parts"].append(wokwi_arduino_mega)
+
+            # add the serial monitor to the wokwi schematic
+            wokwi_design["serialMonitor"] = {
+                "display": "always",
+                "newline": "lf"
+            }
+
+            # connect design inputs to Arduino outputs
+            arduino_mega_outputs = range(2, 11+1)
+            out_idx = 0
+            for input in input_names:
+                con = [ f"mega:{arduino_mega_outputs[out_idx]}", f"input_{input}:IN",
+                        con_color_arduino_interconnect, default_con_instr ]
+                log.debug("    Connection: "+str(con))
+                wokwi_design["connections"].append(con)
+                out_idx += 1
+
+            # connect design outputs to Arduino outputs
+            arduino_mega_inputs = range(12, 21+1)
+            in_idx = 0
+            for output in output_names:
+                con = [ f"mega:{arduino_mega_inputs[in_idx]}", f"output_{output}:OUT",
+                        con_color_arduino_interconnect, default_con_instr ]
+                log.debug("    Connection: "+str(con))
+                wokwi_design["connections"].append(con)
+                in_idx += 1
+
+        else:
+            log.error("Unable to open Arduino sketch template file.")
 
     #log.debug( json.dumps(logic_meta, indent=4) )
 

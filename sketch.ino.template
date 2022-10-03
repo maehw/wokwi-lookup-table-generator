@@ -1,0 +1,295 @@
+// Copyright (c) maehw, 2022
+// wokwi-lookup-table-generator is licensed under the GNU General Public License v3.0
+// Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
+
+/* Let's start with design specific configuration */
+
+#define DESIGN_NUM_USED_INPUTS      ({DESIGN_NUM_USED_INPUTS_PH})
+#define DESIGN_NUM_USED_OUTPUTS     ({DESIGN_NUM_USED_OUTPUTS_PH})
+
+/* Define whether the verification shall halt on the detection of the
+ * first error (true) or keep on running to the end (false).
+ */
+#define VERIFICATION_STOP_ON_ERROR  ({VERIFICATION_STOP_ON_ERROR})
+
+/* This table shall be generated from the truth table!
+ * Obviously, also design specific.
+ */
+uint16_t expected_out_val[2 << (DESIGN_NUM_USED_INPUTS-1)] = {{VERIFICATION_EXPECTED_OUT_VALS_PH}
+};
+
+/* Option to pretty print the input value,
+ * dependent on your design.
+ */
+#undef VERIFICATION_PRETTY_PRINT_INPUT_VAL
+
+#undef VERIFICATION_PRETTY_PRINT_EXPECTED_OUT_VAL
+
+#undef VERIFICATION_PRETTY_PRINT_REAL_OUT_VAL
+
+// ------------------------------------------------------------------------------
+/* Some parameters to tune verification, but actually
+ * no real need to touch any code below this line
+ */
+
+/* As this is run in simulation, baud rate is not that important */
+#define SERIAL_BAUDRATE             ({SERIAL_BAUDRATE_PH})
+
+/* These params can be used to control simulation speed;
+ * getting a correct reading the 7-segment display on my device takes quite some time.
+ */
+#define VERIFICATION_SETUP_TIME_MS  ({VERIFICATION_SETUP_TIME_MS_PH})
+#define VERIFICATION_HOLD_TIME_MS   ({VERIFICATION_HOLD_TIME_MS_PH})
+
+// ------------------------------------------------------------------------------
+/* No real need to touch any code below this line */
+
+/* The mapping of 10 input and 10 output pins each could be static;
+ * however, this limits support to designs with <= 10 input and <= 10 output pins,
+ * instead of limiting the support to designs with an overall pin count of 20!
+ */
+#define DESIGN_IN_0   ( 2)
+#define DESIGN_IN_1   ( 3)
+#define DESIGN_IN_2   ( 4)
+#define DESIGN_IN_3   ( 5)
+#define DESIGN_IN_4   ( 6)
+#define DESIGN_IN_5   ( 7)
+#define DESIGN_IN_6   ( 8)
+#define DESIGN_IN_7   ( 9)
+#define DESIGN_IN_8   (10)
+#define DESIGN_IN_9   (11)
+
+#define DESIGN_OUT_0  (12)
+#define DESIGN_OUT_1  (13)
+#define DESIGN_OUT_2  (14)
+#define DESIGN_OUT_3  (15)
+#define DESIGN_OUT_4  (16)
+#define DESIGN_OUT_5  (17)
+#define DESIGN_OUT_6  (18)
+#define DESIGN_OUT_7  (19)
+#define DESIGN_OUT_8  (20)
+#define DESIGN_OUT_9  (21)
+
+void setup()
+{
+  const bool stop_verification_on_error = VERIFICATION_STOP_ON_ERROR;
+  bool tests_passed = true; /* asume the best for the start */
+
+  Serial.begin(SERIAL_BAUDRATE);
+
+  pinMode(DESIGN_IN_0, OUTPUT);
+  pinMode(DESIGN_IN_1, OUTPUT);
+  pinMode(DESIGN_IN_2, OUTPUT);
+  pinMode(DESIGN_IN_3, OUTPUT);
+  pinMode(DESIGN_IN_4, OUTPUT);
+  pinMode(DESIGN_IN_5, OUTPUT);
+  pinMode(DESIGN_IN_6, OUTPUT);
+  pinMode(DESIGN_IN_7, OUTPUT);
+  pinMode(DESIGN_IN_8, OUTPUT);
+  pinMode(DESIGN_IN_9, OUTPUT);
+
+  pinMode(DESIGN_OUT_0, INPUT);
+  pinMode(DESIGN_OUT_1, INPUT);
+  pinMode(DESIGN_OUT_2, INPUT);
+  pinMode(DESIGN_OUT_3, INPUT);
+  pinMode(DESIGN_OUT_4, INPUT);
+  pinMode(DESIGN_OUT_5, INPUT);
+  pinMode(DESIGN_OUT_6, INPUT);
+  pinMode(DESIGN_OUT_7, INPUT);
+  pinMode(DESIGN_OUT_8, INPUT);
+  pinMode(DESIGN_OUT_9, INPUT);
+
+  Serial.print("Design has ");
+  Serial.print(DESIGN_NUM_USED_INPUTS, DEC);
+  Serial.println(" inputs.");
+
+  Serial.print("Design has ");
+  Serial.print(DESIGN_NUM_USED_OUTPUTS, DEC);
+  Serial.println(" outputs.");
+
+  Serial.print("Testing all 2^");
+  Serial.print(DESIGN_NUM_USED_INPUTS, DEC);
+  Serial.println(" input combinations.");
+
+  Serial.print("Stop verification on error? ");
+  Serial.println(stop_verification_on_error ? "Yes" : "No");
+
+  for(uint16_t in_val = 0; ( in_val < (2 << (DESIGN_NUM_USED_INPUTS-1)) ) &&
+                            ( !stop_verification_on_error ||
+                              (stop_verification_on_error && tests_passed) ); in_val++ )
+  {
+    set_design_input_val(in_val);
+
+    // wait some time before checking outputs
+    delay(VERIFICATION_SETUP_TIME_MS);
+
+    tests_passed &= verify_design_output_val(in_val);
+
+    // wait some time before setting next inputs
+    delay(VERIFICATION_HOLD_TIME_MS);
+  }
+
+  Serial.println();
+  if(tests_passed)
+  {
+    Serial.println("[PASSED]");
+  }
+  else
+  {
+    Serial.println("[FAILED]");
+  }
+}
+
+void set_design_input_val(uint16_t val)
+{
+  /* Set logic design inputs at Arduino's output pins;
+   * output the bits via serial later, so that we don't add large delay between the different pins!
+   */
+  if( (DESIGN_NUM_USED_INPUTS-1) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_0, val & (1 << DESIGN_NUM_USED_INPUTS-1));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-2) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_1, val & (1 << DESIGN_NUM_USED_INPUTS-2));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-3) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_2, val & (1 << DESIGN_NUM_USED_INPUTS-3));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-4) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_3, val & (1 << DESIGN_NUM_USED_INPUTS-4));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-5) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_4, val & (1 << DESIGN_NUM_USED_INPUTS-5));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-6) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_5, val & (1 << DESIGN_NUM_USED_INPUTS-6));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-7) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_6, val & (1 << DESIGN_NUM_USED_INPUTS-7));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-8) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_7, val & (1 << DESIGN_NUM_USED_INPUTS-8));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-9) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_8, val & (1 << DESIGN_NUM_USED_INPUTS-9));
+  }
+  if( (DESIGN_NUM_USED_INPUTS-10) >= 0 )
+  {
+    digitalWrite(DESIGN_IN_9, val & (1 << DESIGN_NUM_USED_INPUTS-10));
+  }
+
+  Serial.print("\nWrote input: 0b");
+  for(int8_t bit_index = DESIGN_NUM_USED_INPUTS-1; bit_index >= 0; bit_index--)
+  {
+    Serial.print((val >> bit_index) & 1, BIN);
+  }
+#ifdef VERIFICATION_PRETTY_PRINT_INPUT_VAL
+  VERIFICATION_PRETTY_PRINT_INPUT_VAL(val);
+#endif
+  Serial.println();
+}
+
+bool verify_design_output_val(uint16_t in_val)
+{
+  // read value from logic design outputs at Arduino's input pins
+  uint16_t val = 0;
+  if( DESIGN_NUM_USED_OUTPUTS >= 1 )
+  {
+    val |= digitalRead(DESIGN_OUT_0);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 2 )
+  {
+    val |= digitalRead(DESIGN_OUT_1);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 3 )
+  {
+    val |= digitalRead(DESIGN_OUT_2);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 4 )
+  {
+    val |= digitalRead(DESIGN_OUT_3);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 5 )
+  {
+    val |= digitalRead(DESIGN_OUT_4);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 6 )
+  {
+    val |= digitalRead(DESIGN_OUT_5);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 7 )
+  {
+    val |= digitalRead(DESIGN_OUT_6);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 8 )
+  {
+    val |= digitalRead(DESIGN_OUT_7);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 9 )
+  {
+    val |= digitalRead(DESIGN_OUT_8);
+    val <<= 1;
+  }
+  if( DESIGN_NUM_USED_OUTPUTS >= 10 )
+  {
+    val |= digitalRead(DESIGN_OUT_9);
+    val <<= 1;
+  }
+  /* the last shift is always one too many */
+  val >>= 1;
+
+
+  Serial.print("  Expected output:  0b");
+  for(int8_t bit_index = DESIGN_NUM_USED_OUTPUTS-1; bit_index >= 0; bit_index--)
+  {
+    Serial.print((expected_out_val[in_val] >> bit_index) & 1, BIN);
+  }
+#ifdef VERIFICATION_PRETTY_PRINT_EXPECTED_OUT_VAL
+  VERIFICATION_PRETTY_PRINT_EXPECTED_OUT_VAL(expected_out_val[in_val]);
+#endif
+  Serial.println();
+
+  Serial.print("  Read back output: 0b");
+  for(int8_t bit_index = DESIGN_NUM_USED_OUTPUTS-1; bit_index >= 0; bit_index--)
+  {
+    Serial.print((val >> bit_index) & 1, BIN);
+  }
+#ifdef VERIFICATION_PRETTY_PRINT_REAL_OUT_VAL
+  VERIFICATION_PRETTY_PRINT_REAL_OUT_VAL();
+#endif
+  Serial.println();
+
+  if(expected_out_val[in_val] == val)
+  {
+    Serial.println("  [PASS]");
+    return true;
+  }
+  else
+  {
+    Serial.println("  [FAIL]");
+    return false;
+  }
+}
+
+void loop()
+{
+  /* no need to loop as everything is only required once and therefore
+   * already done in setup()
+   */
+}
