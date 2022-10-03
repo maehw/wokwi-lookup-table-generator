@@ -23,7 +23,8 @@ To contribute to the project, fork this GitHub repository and create a pull requ
 ## Usage
 
 ```
-$ usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE] [-p | --parts_only | --no-parts_only] [-c | --connections_only | --no-connections_only]
+usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE] [-p | --parts_only | --no-parts_only] [-c | --connections_only | --no-connections_only]
+                   [-t | --test | --no-test]
 
 generate.py is a lookup table generator tool for wokwi
 
@@ -38,6 +39,8 @@ options:
                         dump wokwi parts list only (default: 0)
   -c, --connections_only, --no-connections_only
                         dump wokwi connections list only (default: 0)
+  -t, --test, --no-test
+                        add an Arduino MEGA as test framework and generate Arduino verification code (default: 0)
 ```
 
 Examples:
