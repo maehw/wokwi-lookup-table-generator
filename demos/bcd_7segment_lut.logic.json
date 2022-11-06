@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Lookup table to translate a binary coded decimal (BCD) number to wokwi 7-segment display (https://docs.wokwi.com/parts/wokwi-7segment). Valid values are in the range 0..9, other values will show a blank display.",
-  "inputs": ["a", "b", "c", "d"],
+  "inputs": ["w", "x", "y", "z"],
   "outputs": {
     "A": [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
     "B": [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
