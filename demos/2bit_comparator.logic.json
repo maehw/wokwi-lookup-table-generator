@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "description": "Logic that compares two 2-bit unsigned integer numbers (A and B). Outputs signals tell if A < B (A_LT_B, 'less than'), A = B (A_EQ_B, 'equals') or A > B (A_GT_B, 'greater than').",
+  "inputs": ["B1", "B0", "A1", "A0"],
+  "outputs": {
+    "A_LT_B": [0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0],
+    "A_EQ_B": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    "A_GT_B": [0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0]
+  }
+}

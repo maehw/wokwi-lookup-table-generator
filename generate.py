@@ -44,6 +44,11 @@ if __name__ == '__main__':
                        help='add an Arduino MEGA as test framework and generate Arduino verification code',
                        default=0)
 
+    parser.add_argument('-tt', '--tinytapeout',
+                       action=BooleanOptionalAction,
+                       help='add default parts used in tinytapeout wokwi template schematic',
+                       default=0)
+
     args = parser.parse_args()
 
     # Create and configure logger object
@@ -110,7 +115,80 @@ if __name__ == '__main__':
         "left": -500,
         "rotate": 90,
         "attrs": {}
-   }
+    }
+
+    wokwi_dip_switch8 = {
+        "type": "wokwi-dip-switch-8",
+        "id": "sw1",
+        "top": -188,
+        "left": -400,
+        "rotate": 90,
+        "attrs": {}
+    }
+
+    wokwi_clock_generator = {
+        "type": "wokwi-clock-generator",
+        "id": "clock1",
+        "top": -300,
+        "left": -400,
+        "attrs": {}
+    }
+
+    wokwi_chip_input_8pins = {
+        "type": "chip-input-8-pins",
+        "id": "chip1",
+        "top": -200,
+        "left": -230,
+        "attrs": { "verilogRole": "input" }
+    }
+
+    wokwi_chip_output_8pins = {
+        "type": "chip-output-8-pins",
+        "id": "chip2",
+        "top": -200,
+        "left": 900,
+        "attrs": { "verilogRole": "output" }
+    }
+
+    wokwi_7segment = {
+        "type": "wokwi-7segment",
+        "id": "sevseg1",
+        "top": -200,
+        "left": 1100,
+        "attrs": { "common": "cathode" }
+    }
+
+    wokwi_slide_switch = {
+        "type": "wokwi-slide-switch",
+        "id": "sw2",
+        "top": -320,
+        "left": -300,
+        "attrs": { "value": "1" }
+    }
+
+    wokwi_pushbutton = {
+        "type": "wokwi-pushbutton",
+        "id": "btn1",
+        "top": -410,
+        "left": -400,
+        "attrs": { "color": "grey", "label": "Step", "bounce": "0" }
+    }
+
+    wokwi_vcc = {
+        "type": "wokwi-vcc",
+        "id": None,
+        "top": 0,
+        "left": 0,
+        "attrs": {}
+    }
+
+    wokwi_gnd = {
+        "type": "wokwi-gnd",
+        "id": None,
+        "top": 0,
+        "left": 0,
+        "attrs": {}
+    }
 
     # ------------------------------------------------------------------------------
     # user specific output style and laoyut definition
@@ -138,6 +216,10 @@ if __name__ == '__main__':
     con_color_or_output = "cyan"
     con_color_termination = "black"
     con_color_arduino_interconnect = "black"
+    con_color_vcc_interconnect = "red"
+    con_color_gnd_interconnect = "black"
+    con_color_7seg_interconnect = "green"
+    con_color_board_interconnect = "green"
 
     arduino_sketch_template_file = "sketch.ino.template"
 
@@ -474,7 +556,7 @@ if __name__ == '__main__':
             log.debug("---") # we need some visual separator here
             log.debug(f"  Processing first AND stage of term #{term_idx+1} of the CNF function for output {output}...")
 
-            # if the last AND gate has not been fully used, connect any unconnected input to VCC
+            # if the last AND gate has not been fully used, terminate it
             terminate_current_and_gate()
 
             select_next_and_gate()
@@ -739,6 +821,9 @@ if __name__ == '__main__':
 
     log.info(f"Finished the wokwi design!")
 
+    if args.tinytapeout and args.test:
+        log.warn("Cannot combine flags '--test'/'-t' and '--tinytapeout'/'--tt'. Removing '-tt'.")
+        args.tinytapeout = False
 
     if args.test:
         log.info("Generating verification code and test framework")
@@ -796,6 +881,120 @@ if __name__ == '__main__':
 
         else:
             log.error("Unable to open Arduino sketch template file.")
+
+    if args.tinytapeout:
+        log.info("Adding parts from template for tinytapeout")
+
+        # add parts to the wokwi schematic's parts list
+        wokwi_design["parts"].append(wokwi_dip_switch8)
+        wokwi_design["parts"].append(wokwi_clock_generator)
+        wokwi_design["parts"].append(wokwi_chip_input_8pins)
+        wokwi_design["parts"].append(wokwi_slide_switch)
+        wokwi_design["parts"].append(wokwi_pushbutton)
+
+        # TODO/FIXME: move the next two parts to the far right, next to the output buffer of the top-most signal
+        wokwi_design["parts"].append(wokwi_chip_output_8pins)
+        wokwi_design["parts"].append(wokwi_7segment)
+
+        vcc_btn = wokwi_vcc.copy()
+        vcc_btn["id"] = "vcc_btn"
+        vcc_btn["top"] = -450
+        vcc_btn["left"] = -320
+        vcc_dipsw = wokwi_vcc.copy()
+        vcc_dipsw["id"] = "vcc_dipsw"
+        vcc_dipsw["top"] = -240
+        vcc_dipsw["left"] = -420
+        wokwi_design["parts"].append(vcc_btn)
+        wokwi_design["parts"].append(vcc_dipsw)
+
+        gnd_7seg = wokwi_gnd.copy()
+        gnd_7seg["id"] = "gnd_7seg"
+        gnd_7seg["top"] = -70
+        gnd_7seg["left"] = 1100
+        wokwi_design["parts"].append(gnd_7seg)
+
+
+        # add connections
+        for i in range(1, 8+1):
+            con = [ "vcc_dipsw:VCC", f"sw1:{i}a", con_color_vcc_interconnect, default_con_instr ]
+            log.debug("    Connection: "+str(con))
+            wokwi_design["connections"].append(con)
+
+        con = [ "btn1:2.r", "sw2:3", "orange", [ "h90", "*", "v10" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+
+        con = [ "vcc_btn:VCC", "btn1:1.r", con_color_vcc_interconnect, [ "v0" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+
+        con = [ "sw2:1", "clock1:CLK", "green", [ "v0" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+
+        con = [ "sw2:3", "sw1:1b", "violet", [ "v0" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+
+        con = [ "chip1:EXTIN0", "sw2:2", "green", [ "h0", "v-40", "h-20" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+
+        for i in range(2, 8+1):
+            con = [ f"chip1:EXTIN{i-1}", f"sw1:{i}b", "violet", [ "h0" ] ]
+            log.debug("    Connection: "+str(con))
+            wokwi_design["connections"].append(con)
+
+        con = [ "chip2:EXTOUT0", "sevseg1:A", con_color_7seg_interconnect, [ "h21.01", "v-28.8", "h96" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT1", "sevseg1:B", con_color_7seg_interconnect, [ "h11.41", "v-48", "h115.2", "v38.4" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT2", "sevseg1:C", con_color_7seg_interconnect, [ "h30.61", "v-38.4", "h115.2", "v105.6", "h-28.8" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT3", "sevseg1:D", con_color_7seg_interconnect, [ "h49.81", "v57.6", "h48" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT4", "sevseg1:E", con_color_7seg_interconnect, [ "v9.6", "h-48", "v-38.4" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT5", "sevseg1:F", con_color_7seg_interconnect, [ "h69.01", "v-57.6", "h28.8" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT6", "sevseg1:G", con_color_7seg_interconnect, [ "h78.61", "v-57.6" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT7", "sevseg1:DP", con_color_7seg_interconnect, [ "v28.8", "h136.21" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "chip2:EXTOUT7", "sevseg1:DP", con_color_7seg_interconnect, [ "v28.8", "h136.21" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+        con = [ "gnd_7seg:GND", "sevseg1:COM.1", con_color_gnd_interconnect, [ "v0" ] ]
+        log.debug("    Connection: "+str(con))
+        wokwi_design["connections"].append(con)
+
+        # Check number of inputs
+        if num_inputs > 8:
+            log.warn("Won't be able to connect more than 8 inputs!")
+            num_inputs = 8
+
+        for k in range(num_inputs):
+            con = [ f"chip1:IN{k}", "input_"+input_names[k]+":IN", con_color_board_interconnect, default_con_instr ]
+            log.debug("    Connection: "+str(con))
+            wokwi_design["connections"].append(con)
+
+        # Check number of outputs
+        if num_outputs > 8:
+            log.warn("Won't be able to connect more than 8 outputs!")
+            num_outputs = 8
+
+        for k in range(num_outputs):
+            con = [ "output_"+output_names[k]+":OUT", f"chip2:OUT{k}", con_color_board_interconnect, default_con_instr ]
+            log.debug("    Connection: "+str(con))
+            wokwi_design["connections"].append(con)
 
     #log.debug( json.dumps(logic_meta, indent=4) )
 
