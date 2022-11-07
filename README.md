@@ -23,8 +23,9 @@ To contribute to the project, fork this GitHub repository and create a pull requ
 ## Usage
 
 ```
-usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE] [-p | --parts_only | --no-parts_only] [-c | --connections_only | --no-connections_only]
-                   [-t | --test | --no-test]
+usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE] [-p | --parts_only | --no-parts_only]
+                   [-c | --connections_only | --no-connections_only] [-t | --test | --no-test]
+                   [-tt | --tinytapeout | --no-tinytapeout]
 
 generate.py is a lookup table generator tool for wokwi
 
@@ -41,6 +42,8 @@ options:
                         dump wokwi connections list only (default: 0)
   -t, --test, --no-test
                         add an Arduino MEGA as test framework and generate Arduino verification code (default: 0)
+  -tt, --tinytapeout, --no-tinytapeout
+                        add default parts used in tinytapeout wokwi template schematic (default: 0)
 ```
 
 Examples:
@@ -220,6 +223,14 @@ The algorithm basically performs the following steps (be careful as this concept
 
 
 Further read: [Département d'informatique et de recherche opérationnelle - Université de Montréal: LOGIC SYNTHESIS AND TWO LEVEL LOGIC OPTIMIZATION](http://www.iro.umontreal.ca/~dift6221/demicheli4/twolevel1.4.ps.pdf)
+
+
+## Tiny Tapeout
+
+See also:
+
+* https://tinytapeout.com/
+* [Tiny Tapeout 2 Guide](https://github.com/maehw/wokwi-lookup-table-generator/wiki/Tiny-Tapeout-2---Guide#generating-and-verifying-wokwi-designs-with-combinational-logic) - Generating and verifying wokwi designs with combinational logic
 
 
 ## TODOs
