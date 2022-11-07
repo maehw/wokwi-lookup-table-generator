@@ -230,7 +230,7 @@ Further read: [Département d'informatique et de recherche opérationnelle - Uni
 See also:
 
 * https://tinytapeout.com/
-* [Tiny Tapeout 2 Guide](https://github.com/maehw/wokwi-lookup-table-generator/wiki/Tiny-Tapeout-2---Guide#generating-and-verifying-wokwi-designs-with-combinational-logic) - Generating and verifying wokwi designs with combinational logic
+* [Tiny Tapeout 2 Guide](https://github.com/maehw/wokwi-lookup-table-generator/wiki/Tiny-Tapeout-2--Guide#generating-and-verifying-wokwi-designs-with-combinational-logic) - Generating and verifying wokwi designs with combinational logic
 
 
 ## TODOs
