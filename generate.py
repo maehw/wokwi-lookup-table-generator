@@ -30,24 +30,24 @@ if __name__ == '__main__':
                         default=None)
 
     parser.add_argument('-p', '--parts_only',
-                       action=BooleanOptionalAction,
+                       action='store_true',
                        help='dump wokwi parts list only',
-                       default=0)
+                       default=False)
 
     parser.add_argument('-c', '--connections_only',
-                        action=BooleanOptionalAction,
+                        action='store_true',
                         help='dump wokwi connections list only',
-                        default=0)
+                        default=False)
 
     parser.add_argument('-t', '--test',
-                       action=BooleanOptionalAction,
+                       action='store_true',
                        help='add an Arduino MEGA as test framework and generate Arduino verification code',
-                       default=0)
+                       default=False)
 
     parser.add_argument('-tt', '--tinytapeout',
-                       action=BooleanOptionalAction,
-                       help='add default parts used in tinytapeout wokwi template schematic',
-                       default=0)
+                        help='add default parts used in tinytapeout wokwi template schematic',
+                        action='store_true',
+                        default=False)
 
     args = parser.parse_args()
 
@@ -822,7 +822,7 @@ if __name__ == '__main__':
     log.info(f"Finished the wokwi design!")
 
     if args.tinytapeout and args.test:
-        log.warn("Cannot combine flags '--test'/'-t' and '--tinytapeout'/'--tt'. Removing '-tt'.")
+        log.warning("Cannot combine flags '--test'/'-t' and '--tinytapeout'/'--tt'. Removing '-tt'.")
         args.tinytapeout = False
 
     if args.test:
