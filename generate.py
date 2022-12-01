@@ -4,7 +4,7 @@ import math
 import coloredlogs, logging
 from os import linesep
 from quine_mccluskey import qm
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, BooleanOptionalAction
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 # Copyright (c) maehw, 2022
 # wokwi-lookup-table-generator is licensed under the GNU General Public License v3.0
