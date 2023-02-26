@@ -7,7 +7,7 @@ from os import linesep
 from quine_mccluskey import qm
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
-# Copyright (c) maehw, 2022
+# Copyright (c) maehw, 2022-2023
 # wokwi-lookup-table-generator is licensed under the GNU General Public License v3.0
 # Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
 
@@ -59,14 +59,14 @@ if __name__ == '__main__':
 
     # Create and configure logger object
     log = logging.getLogger(__name__)
-    #coloredlogs.install(level='DEBUG', fmt='%(asctime)s [%(levelname)8s] %(message)s')
+    # coloredlogs.install(level='DEBUG', fmt='%(asctime)s [%(levelname)8s] %(message)s')
 
     if args.verbose > 0:
-        log_level='INFO'
+        log_level = 'INFO'
         if args.verbose > 1:
-            log_level='DEBUG'
+            log_level = 'DEBUG'
     else:
-        log_level='WARNING'
+        log_level = 'WARNING'
 
     coloredlogs.install(level=log_level, fmt='[%(levelname)8s] %(message)s')
 
@@ -75,11 +75,11 @@ if __name__ == '__main__':
     # templates for wokwi part instances
     global wokwi_design
     wokwi_design = {
-      "version": 1,
-      "author": "maehw",
-      "editor": "wokwi",
-      "parts": [],
-      "connections": []
+        "version": 1,
+        "author": "maehw",
+        "editor": "wokwi",
+        "parts": [],
+        "connections": []
     }
 
     wokwi_gate_not = {
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         "id": "chip1",
         "top": -200,
         "left": -230,
-        "attrs": { "verilogRole": "input" }
+        "attrs": {"verilogRole": "input"}
     }
 
     wokwi_chip_output_8pins = {
@@ -153,7 +153,7 @@ if __name__ == '__main__':
         "id": "chip2",
         "top": -200,
         "left": 900,
-        "attrs": { "verilogRole": "output" }
+        "attrs": {"verilogRole": "output"}
     }
 
     wokwi_board_tt_block_input_8 = {
@@ -161,7 +161,7 @@ if __name__ == '__main__':
         "id": "ttin",
         "top": -200,
         "left": -230,
-        "attrs": { "verilogRole": "input" }
+        "attrs": {"verilogRole": "input"}
     }
 
     wokwi_board_tt_block_output = {
@@ -169,7 +169,7 @@ if __name__ == '__main__':
         "id": "ttout",
         "top": -200,
         "left": 900,
-        "attrs": { "verilogRole": "output" }
+        "attrs": {"verilogRole": "output"}
     }
 
     wokwi_7segment = {
@@ -177,7 +177,7 @@ if __name__ == '__main__':
         "id": "sevseg1",
         "top": -200,
         "left": 1100,
-        "attrs": { "common": "cathode" }
+        "attrs": {"common": "cathode"}
     }
 
     wokwi_slide_switch = {
@@ -185,7 +185,7 @@ if __name__ == '__main__':
         "id": "sw2",
         "top": -320,
         "left": -300,
-        "attrs": { "value": "1" }
+        "attrs": {"value": "1"}
     }
 
     wokwi_pushbutton = {
@@ -193,7 +193,7 @@ if __name__ == '__main__':
         "id": "btn1",
         "top": -410,
         "left": -400,
-        "attrs": { "color": "grey", "label": "Step", "bounce": "0" }
+        "attrs": {"color": "grey", "label": "Step", "bounce": "0"}
     }
 
     wokwi_vcc = {
@@ -218,11 +218,11 @@ if __name__ == '__main__':
     wokwi_gate_spacing_v = 60
     wokwi_gate_spacing_h = 120
 
-    sym_negation = '~' # could also be 'NOT '
-    sym_and = '' # could also be ' AND ' / '*'
-    sym_or = ' + ' # could also be ' OR '
-    sym_term_start = '' # '('
-    sym_term_end = '' # ')'
+    sym_negation = '~'  # alternative suggestion: 'NOT '
+    sym_and = ''  # alternative suggestions: ' AND ' / '*'
+    sym_or = ' + '  # alternative suggestion: ' OR '
+    sym_term_start = ''  # alternative suggestion: '('
+    sym_term_end = ''  # alternative suggestion: ')'
 
     # default connection instructions:
     # global default and special default for termination connections
@@ -268,24 +268,27 @@ if __name__ == '__main__':
         else:
             stage_inputs = num_all_inputs
             done = False
-            while(not done):
+            while not done:
                 num_stages = num_stages + 1
-                num_gates_stage = math.ceil(stage_inputs/2)
-                #print(f"Number of gates in stage #{num_stages}: {num_gates_stage}")
+                num_gates_stage = math.ceil(stage_inputs / 2)
+                # print(f"Number of gates in stage #{num_stages}: {num_gates_stage}")
 
                 num_gates = num_gates + num_gates_stage
                 stage_inputs = num_gates_stage
 
                 if num_gates_stage == 1:
                     done = True
-        return (num_gates, num_stages)
+        return num_gates, num_stages
 
-    def get_part_by_id(id):
-        part = next((item for item in wokwi_design["parts"] if item['id'] == id), None)
+
+    def get_part_by_id(identifier):
+        part = next((item for item in wokwi_design["parts"] if item['id'] == identifier), None)
         return part
 
-    def delete_part_by_id(id):
-        wokwi_design["parts"] = [d for d in wokwi_design["parts"] if d.get('id') != id]
+
+    def delete_part_by_id(identifier):
+        wokwi_design["parts"] = [d for d in wokwi_design["parts"] if d.get('id') != identifier]
+
 
     def terminate_current_and_gate():
         global global_and_gate_idx
@@ -295,11 +298,12 @@ if __name__ == '__main__':
             num_open_ports = 2 - global_and_gate_used_inports
             if num_open_ports > 0:
                 log.debug(f"    Terminating AND gate #{global_and_gate_idx}'s {num_open_ports} open input(s)")
-                con = [ f"gate_and_{global_and_gate_idx}:A", f"gate_and_{global_and_gate_idx}:B",
-                        con_color_termination, default_con_termination_instr ]
+                con = [f"gate_and_{global_and_gate_idx}:A", f"gate_and_{global_and_gate_idx}:B",
+                       con_color_termination, default_con_termination_instr]
                 wokwi_design["connections"].append(con)
-                log.debug("      Connection: "+str(con))
+                log.debug("      Connection: " + str(con))
                 global_and_gate_used_inports = 2
+
 
     def terminate_current_or_gate():
         global global_or_gate_idx
@@ -309,11 +313,12 @@ if __name__ == '__main__':
             num_open_ports = 2 - global_or_gate_used_inports
             if num_open_ports > 0:
                 log.debug(f"    Terminating OR gate #{global_or_gate_idx}'s {num_open_ports} open input(s)")
-                con = [ f"gate_or_{global_or_gate_idx}:A", f"gate_or_{global_or_gate_idx}:B",
-                        con_color_termination, default_con_termination_instr ]
+                con = [f"gate_or_{global_or_gate_idx}:A", f"gate_or_{global_or_gate_idx}:B",
+                       con_color_termination, default_con_termination_instr]
                 wokwi_design["connections"].append(con)
-                log.debug("      Connection: "+str(con))
+                log.debug("      Connection: " + str(con))
                 global_or_gate_used_inports = 2
+
 
     def select_next_or_gate():
         global global_or_gate_idx
@@ -324,6 +329,7 @@ if __name__ == '__main__':
 
         global_or_gate_used_inports = 0
 
+
     def select_next_and_gate():
         global global_and_gate_idx
         global global_and_gate_used_inports
@@ -332,6 +338,7 @@ if __name__ == '__main__':
         log.debug(f"    Selected next AND gate #{global_and_gate_idx}")
 
         global_and_gate_used_inports = 0
+
 
     def allocate_next_free_and_gate_inport():
         global global_and_gate_idx
@@ -346,6 +353,7 @@ if __name__ == '__main__':
 
         return retval
 
+
     def allocate_next_free_or_gate_inport():
         global global_or_gate_idx
         global global_or_gate_used_inports
@@ -359,11 +367,12 @@ if __name__ == '__main__':
 
         return retval
 
+
     def get_expected_bin_out_vals(output_names, output_data, num_inputs):
         # create binary based expectation values for Arduino verification code
         # see also: https://www.arduino.cc/reference/en/language/variables/constants/integerconstants/
         expected_bin_val = ""
-        for k in range(2**num_inputs):
+        for k in range(2 ** num_inputs):
             expected_bin_val += linesep + "    0b"
             for output in output_names:
                 expected_bin_val += str(output_data[output][k])
@@ -395,7 +404,7 @@ if __name__ == '__main__':
     in_data = {}
     try:
         with open(args.in_file, 'r') as f:
-            in_data = json.loads( f.read() )
+            in_data = json.loads(f.read())
             log.info(f"Data is read from input file '{args.in_file}'")
     except FileNotFoundError:
         log.error(f"Input file '{args.in_file}' cannot be found. Use flag '-h' to get usage.")
@@ -403,13 +412,14 @@ if __name__ == '__main__':
 
     # the 'logic' dictionary used within this script defines the
     # - names of the output variables
-    # - the list of integers that describe the input combination (row index of the truth table) when the output function is '1'
+    # - the list of integers that describe the input combination (row index of the truth table)
+    #   when the output function is '1'
     # note: the order of key-value entries inside the dictionary is not relevant
     logic = {}
 
     input_names = in_data["inputs"]
     num_inputs = len(input_names)
-    output_names = list( in_data["outputs"].keys() )
+    output_names = list(in_data["outputs"].keys())
     num_outputs = len(output_names)
 
     log.info(f"Inputs:    {num_inputs:2} {input_names}")
@@ -417,12 +427,12 @@ if __name__ == '__main__':
 
     for output in output_names:
         # make sure that we have 2^num_inputs output values!
-        assert len(in_data["outputs"][output]) == 2**num_inputs
-        ones = [i for i in range(2**num_inputs) if in_data["outputs"][output][i] == 1]
+        assert len(in_data["outputs"][output]) == 2 ** num_inputs
+        ones = [i for i in range(2 ** num_inputs) if in_data["outputs"][output][i] == 1]
         log.info(f"  Output {output}: {in_data['outputs'][output]}; ones: {ones}")
-        logic[output] = ones;
+        logic[output] = ones
 
-    max_ones_idx = 2**num_inputs - 1
+    max_ones_idx = 2 ** num_inputs - 1
     log.debug(f"Max ones idx: 2^{num_inputs} - 1 = {max_ones_idx}")
 
     log.debug("Wokwi design (at start):")
@@ -440,23 +450,23 @@ if __name__ == '__main__':
     num_and_stages_max_overall = 0
     num_or_stages_max_overall = 0
 
-     # keep meta data for resource estimation, etc
+    # keep meta data for resource estimation, etc
     logic_meta = {}
 
     q = qm.QuineMcCluskey()
 
     # ------------------------------------------------------------------------------
     # first iteration over all outputs is to show all the CNF terms,
-    # to get a part resources estimation;
+    # to get a parts resources estimation;
     # please note that they ae not added to and layed out in the wokwi design yet
     for output in logic:
         # reset estimation counters for the current output
         logic_meta[output] = {
             "qm_terms_raw": [],
-            "num_terms": 0, # num_ORed_AND_terms
-            "cnf_function": "", # build up string to get a human readable function in conjunctive normal form (CNF)
+            "num_terms": 0,  # num_ORed_AND_terms
+            "cnf_function": "",  # build up string to get a human-readable function in conjunctive normal form (CNF)
             "num_and_gates": 0,
-            "num_and_gate_stages": [], # for every term
+            "num_and_gate_stages": [],  # for every term
             "num_and_gate_stages_max": 0,
             "and_gates_first_stage": [],
             "inputs_for_first_or_gate_stage": [],
@@ -465,7 +475,10 @@ if __name__ == '__main__':
         }
 
         log.debug(f"Running Quine-McCluskey algorithm for output {output}...")
-        logic_meta[output]["qm_terms_raw"] = list( q.simplify(logic[output]) ) # convert set into list (to allow indexing)
+
+        # convert set into list (to allow indexing)
+        logic_meta[output]["qm_terms_raw"] = list(q.simplify(logic[output]))
+
         log.debug(f"Raw qm terms for {output}: {logic_meta[output]['qm_terms_raw']}")
 
         # iterate over the terms (those that are OR'ed)
@@ -480,8 +493,9 @@ if __name__ == '__main__':
             # if it is used check if the negated or original variable is used
             num_inputs_in_term = 0
             for input_idx in range(num_inputs):
-                #The next log line give very verbose debugging, comment it out for now
-                #log.debug(f"Is input #{input_idx} used in the current term {logic_meta[output]['terms_raw'][term_idx]}? {logic_meta[output]['terms_raw'][term_idx][input_idx]}")
+                # The next log line give very verbose debugging, comment it out for now
+                # log.debug(f"Is input #{input_idx} used in the current term
+                # {logic_meta[output]['terms_raw'][term_idx]}? {logic_meta[output]['terms_raw'][term_idx][input_idx]}")
                 if logic_meta[output]['qm_terms_raw'][term_idx][input_idx] in ['0', '1']:
                     if num_inputs_in_term > 0:
                         # if another input has been used in the term before, add symbol for AND op
@@ -502,10 +516,11 @@ if __name__ == '__main__':
             logic_meta[output]["num_and_gates"] += term_num_and_gates
 
             # take maximum of AND stages for the output
-            logic_meta[output]["num_and_gate_stages_max"] = max(logic_meta[output]["num_and_gate_stages_max"], term_num_and_stages)
+            logic_meta[output]["num_and_gate_stages_max"] = max(logic_meta[output]["num_and_gate_stages_max"],
+                                                                term_num_and_stages)
 
             # leave out the 'or' after last term
-            if term_idx < logic_meta[output]["num_terms"]-1:
+            if term_idx < logic_meta[output]["num_terms"] - 1:
                 cnf_function += sym_or
 
         # function description in CNF is completed
@@ -516,7 +531,8 @@ if __name__ == '__main__':
 
         log.debug(f"    Number of OR'ed AND-terms: {logic_meta[output]['num_terms']}")
 
-        log.debug(f"    Calculation of output {output} requires {logic_meta[output]['num_and_gates']:3} two-input AND gate(s)")
+        log.debug(f"    Calculation of output {output} requires {logic_meta[output]['num_and_gates']:3} "
+                  f"two-input AND gate(s)")
         log.debug(f"                              in max {logic_meta[output]['num_and_gate_stages_max']:3} stage(s)")
 
         # not only for this output but for the whole device
@@ -543,21 +559,21 @@ if __name__ == '__main__':
     # Input buffers and NOT gates
     for k in range(num_inputs):
         wokwi_gate_buffer_inst = wokwi_gate_buffer.copy()
-        wokwi_gate_buffer_inst["id"] = "input_"+input_names[k]
-        wokwi_gate_buffer_inst["top"] = 2*k*wokwi_gate_spacing_v
+        wokwi_gate_buffer_inst["id"] = "input_" + input_names[k]
+        wokwi_gate_buffer_inst["top"] = 2 * k * wokwi_gate_spacing_v
         wokwi_gate_buffer_inst["left"] = 0
         wokwi_design["parts"].append(wokwi_gate_buffer_inst)
 
         wokwi_gate_not_inst = wokwi_gate_not.copy()
-        wokwi_gate_not_inst["id"] = "input_not_"+input_names[k]
-        wokwi_gate_not_inst["top"] = (2*k + 1)*wokwi_gate_spacing_v
+        wokwi_gate_not_inst["id"] = "input_not_" + input_names[k]
+        wokwi_gate_not_inst["top"] = (2 * k + 1) * wokwi_gate_spacing_v
         wokwi_gate_not_inst["left"] = 0
         wokwi_design["parts"].append(wokwi_gate_not_inst)
 
         # directly connect the negated inputs to the buffers of the non-negated inputs
-        con = [ f"input_not_{input_names[k]}:IN", f"input_{input_names[k]}:IN",
-                con_color_termination, default_con_termination_instr ]
-        log.debug("    Connection: "+str(con))
+        con = [f"input_not_{input_names[k]}:IN", f"input_{input_names[k]}:IN",
+               con_color_termination, default_con_termination_instr]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
     log.debug("Added input buffer and NOT gate parts to the wokwi design")
     log.debug("Also connected their inputs together as they are derived from the same inputs")
@@ -576,12 +592,14 @@ if __name__ == '__main__':
     log.info("")
     log.info("Connecting inputs with first stage of AND gates for every output.")
     for output in logic:
-        log.info(f"Connecting input inside the wokwi design to first AND gate stage (later used for output {output})...")
+        log.info(f"Connecting input inside the wokwi design to first AND gate stage "
+                 f"(later used for output {output})...")
 
         # iterate over the terms of the CNF output function
         for term_idx in range(logic_meta[output]["num_terms"]):
-            log.debug("---") # we need some visual separator here
-            log.debug(f"  Processing first AND stage of term #{term_idx+1} of the CNF function for output {output}...")
+            log.debug("---")  # we need some visual separator here
+            log.debug(
+                f"  Processing first AND stage of term #{term_idx + 1} of the CNF function for output {output}...")
 
             # if the last AND gate has not been fully used, terminate it
             terminate_current_and_gate()
@@ -595,7 +613,8 @@ if __name__ == '__main__':
 
                 if logic_meta[output]['qm_terms_raw'][term_idx][input_idx] in ['0', '1']:
                     (and_gate_idx, and_gate_port_idx, and_gate_port_name) = allocate_next_free_and_gate_inport()
-                    log.debug(f"    Allocated port #{and_gate_port_idx} ('{and_gate_port_name}') of AND gate #{and_gate_idx}")
+                    log.debug(f"    Allocated port #{and_gate_port_idx} ('{and_gate_port_name}') of "
+                              f"AND gate #{and_gate_idx}")
 
                     # put AND gate in a list as reminder to work on them later
                     current_term_and_gates_for_first_stage.append(and_gate_idx)
@@ -603,14 +622,16 @@ if __name__ == '__main__':
                     if '0' == logic_meta[output]['qm_terms_raw'][term_idx][input_idx]:
                         log.debug(f"    Use negated input {input_names[input_idx]}")
                         # connect current AND's input port to negated device input
-                        con = [ f"input_not_{input_names[input_idx]}:OUT", f"gate_and_{and_gate_idx}:{and_gate_port_name}",
-                                con_color_neginput_and, default_con_instr ]
+                        con = [f"input_not_{input_names[input_idx]}:OUT",
+                               f"gate_and_{and_gate_idx}:{and_gate_port_name}",
+                               con_color_neginput_and, default_con_instr]
                     else:
                         log.debug(f"    Use input {input_names[input_idx]}")
                         # connect current AND's input port to non-negated device input
-                        con = [ f"input_{input_names[input_idx]}:OUT", f"gate_and_{and_gate_idx}:{and_gate_port_name}",
-                                con_color_input_and, default_con_instr ]
-                    log.debug("      Connection: "+str(con))
+                        con = [f"input_{input_names[input_idx]}:OUT",
+                               f"gate_and_{and_gate_idx}:{and_gate_port_name}",
+                               con_color_input_and, default_con_instr]
+                    log.debug("      Connection: " + str(con))
                     wokwi_design["connections"].append(con)
 
             # if the last AND gate has not been fully used (odd number of inputs), terminate it
@@ -620,9 +641,11 @@ if __name__ == '__main__':
 
             logic_meta[output]["and_gates_first_stage"].append(and_gates_used_during_stage)
 
-            log.debug(f"  Processing first AND stage of term #{term_idx+1} of the CNF function for output {output} is done and used AND gates {and_gates_used_during_stage}")
+            log.debug(f"  Processing first AND stage of term #{term_idx + 1} of the CNF function for "
+                      f"output {output} is done and used AND gates {and_gates_used_during_stage}")
 
-        log.info(f"All AND gates required in the first AND gate stage for output {output}: {str(logic_meta[output]['and_gates_first_stage'])}")
+        log.info(f"All AND gates required in the first AND gate stage for "
+                 f"output {output}: {str(logic_meta[output]['and_gates_first_stage'])}")
         # next loop iteration for the function of the next output
         # ------------------------------------------------------------------------------
     log.info("Connecting inputs with first stage of AND gates for every output completed.")
@@ -636,7 +659,7 @@ if __name__ == '__main__':
         and_gates_for_first_or_stage = []
 
         for current_term_and_gates_for_first_stage in logic_meta[output]['and_gates_first_stage']:
-            #log.info(current_term_and_gates_for_first_stage)
+            # log.info(current_term_and_gates_for_first_stage)
 
             if len(current_term_and_gates_for_first_stage) == 0:
                 log.error("Something went wrong with the first stage of AND gates for current term.")
@@ -667,9 +690,10 @@ if __name__ == '__main__':
                         output_and_gates_for_stage.append(and_gate_idx)
 
                         # connect previous AND gate's output to current AND gate's input port
-                        con = [ f"gate_and_{input_gate_for_stage}:OUT", f"gate_and_{and_gate_idx}:{and_gate_port_name}",
-                                con_color_and_and_interconnect, default_con_instr ]
-                        log.debug("    Connection: "+str(con))
+                        con = [f"gate_and_{input_gate_for_stage}:OUT",
+                               f"gate_and_{and_gate_idx}:{and_gate_port_name}",
+                               con_color_and_and_interconnect, default_con_instr]
+                        log.debug("    Connection: " + str(con))
                         wokwi_design["connections"].append(con)
 
                     # remove duplicates
@@ -680,12 +704,16 @@ if __name__ == '__main__':
                         and_gates_for_first_or_stage.append(output_and_gates_for_stage[0])
                         break
                     else:
-                        log.debug(f"  Still having more than one AND gate left: {output_and_gates_for_stage}, turning another round")
+                        log.debug(f"  Still having more than one AND gate left: {output_and_gates_for_stage}, "
+                                  f"turning another round")
                         terminate_current_and_gate()
-                        depth += 1 # turn another round and keep track of depth for the layout
-                        input_gates_for_stage = output_and_gates_for_stage # output of this round is input for next round
+                        depth += 1  # turn another round and keep track of depth for the layout
 
-        log.info(f"Remaining AND gates (final stage): {and_gates_for_first_or_stage} for the output {output} to be connected to OR gates")
+                        # output of this round is input for next round
+                        input_gates_for_stage = output_and_gates_for_stage
+
+        log.info(f"Remaining AND gates (final stage): {and_gates_for_first_or_stage} for "
+                 f"the output {output} to be connected to OR gates")
         logic_meta[output]['inputs_for_first_or_gate_stage'] = and_gates_for_first_or_stage
     log.info("Merges of all first stage AND gates down to a single 'root' AND gate completed.")
 
@@ -716,9 +744,10 @@ if __name__ == '__main__':
             output_or_gates_for_stage.append(or_gate_idx)
 
             # connect AND gate's output port to OR gate's input port
-            con = [ f"gate_and_{gates_for_first_stage[0]}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
-                    con_color_and_or_interconnect, default_con_instr ]
-            log.debug("    Connection: "+str(con))
+            con = [f"gate_and_{gates_for_first_stage[0]}:OUT",
+                   f"gate_or_{or_gate_idx}:{or_gate_port_name}",
+                   con_color_and_or_interconnect, default_con_instr]
+            log.debug("    Connection: " + str(con))
             wokwi_design["connections"].append(con)
 
             # directly terminate it, as it's only a dummy OR gate (second inport not needed)
@@ -736,9 +765,9 @@ if __name__ == '__main__':
                 output_or_gates_for_stage.append(or_gate_idx)
 
                 # connect AND gate's output port to OR gate's input port
-                con = [ f"gate_and_{input_gate_for_stage}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
-                        con_color_and_or_interconnect, default_con_instr ]
-                log.debug("    Connection: "+str(con))
+                con = [f"gate_and_{input_gate_for_stage}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
+                       con_color_and_or_interconnect, default_con_instr]
+                log.debug("    Connection: " + str(con))
                 wokwi_design["connections"].append(con)
 
                 # remove duplicates
@@ -765,13 +794,13 @@ if __name__ == '__main__':
 
         # starting point
         input_gates_for_stage = logic_meta[output]['or_gates_first_stage']
-        #log.info(logic_meta[output]['or_gates_first_stage'])
+        # log.info(logic_meta[output]['or_gates_first_stage'])
 
         depth = 1
         max_or_gate_stages = max(max_or_gate_stages, depth)
 
         if not hasattr(input_gates_for_stage, "__len__"):
-            input_gates_for_stage = [ input_gates_for_stage ]
+            input_gates_for_stage = [input_gates_for_stage]
             log.warning("input_gates_for_stage is scalar but that should already be handled correctly")
 
         log.info(f"Number of OR gates to be merged: {len(input_gates_for_stage)}, i.e. {input_gates_for_stage}")
@@ -786,18 +815,18 @@ if __name__ == '__main__':
 
                 for input_gate_for_stage in input_gates_for_stage:
                     (or_gate_idx, or_gate_port_idx, or_gate_port_name) = allocate_next_free_or_gate_inport()
-                    #log.info(f"Allocated OR gate {or_gate_idx}")
+                    # log.info(f"Allocated OR gate {or_gate_idx}")
 
-                    #if or_gate_port_idx == 0:
+                    # if or_gate_port_idx == 0:
                     #    get_part_by_id(f"gate_or_{and_gate_idx}")["left"] += depth * wokwi_gate_spacing_h
 
                     # put OR gate in a list as reminder to work on them later
                     output_or_gates_for_stage.append(or_gate_idx)
 
                     # connect previous OR gate's output to current OR gate's input port
-                    con = [ f"gate_or_{input_gate_for_stage}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
-                            con_color_or_or_interconnect, default_con_instr ]
-                    log.debug("    Connection: "+str(con))
+                    con = [f"gate_or_{input_gate_for_stage}:OUT", f"gate_or_{or_gate_idx}:{or_gate_port_name}",
+                           con_color_or_or_interconnect, default_con_instr]
+                    log.debug("    Connection: " + str(con))
                     wokwi_design["connections"].append(con)
 
                 # remove duplicates
@@ -808,41 +837,45 @@ if __name__ == '__main__':
                     final_or_gate_for_output = output_or_gates_for_stage[0]
                     break
                 else:
-                    log.debug(f"  Still having more than one OR gate left: {output_or_gates_for_stage}, turning another round")
+                    log.debug(f"  Still having more than one OR gate left: {output_or_gates_for_stage}, "
+                              f"turning another round")
                     terminate_current_and_gate()
-                    depth += 1 # turn another round and keep track of depth for the layout
+                    depth += 1  # turn another round and keep track of depth for the layout
                     max_or_gate_stages = max(max_or_gate_stages, depth)
-                    input_gates_for_stage = output_or_gates_for_stage # output of this round is input for next round
+                    input_gates_for_stage = output_or_gates_for_stage  # output of this round is input for next round
 
-        log.info(f"Identified #{final_or_gate_for_output} as final OR gate for the output {output} to be connected to output buffer")
+        log.info(f"Identified #{final_or_gate_for_output} as final OR gate for the "
+                 f"output {output} to be connected to output buffer")
 
         # stor in meta dictionary
         logic_meta[output]['final_or_gate'] = final_or_gate_for_output
 
         # connect AND gate's output port to OR gate's input port
-        con = [ f"gate_or_{final_or_gate_for_output}:OUT", f"output_{output}:IN",
-                con_color_or_output, default_con_instr ]
-        log.debug("    Connection: "+str(con))
+        con = [f"gate_or_{final_or_gate_for_output}:OUT", f"output_{output}:IN",
+               con_color_or_output, default_con_instr]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
 
     log.info(f"Max AND gate stages: {num_and_stages_max_overall}")
     log.info(f"Max  OR gate stages: {max_or_gate_stages}")
 
     # OR gates
-    for k in range(global_or_gate_idx+1):
+    for k in range(global_or_gate_idx + 1):
         wokwi_gate_or_inst = wokwi_gate_or2.copy()
         wokwi_gate_or_inst["id"] = f"gate_or_{k}"
         wokwi_gate_or_inst["top"] = k * wokwi_gate_spacing_v
-        wokwi_gate_or_inst["left"] = wokwi_gate_and_inst["left"] + num_and_stages_max_overall * wokwi_gate_spacing_h # TODO/FIXME
+        wokwi_gate_or_inst["left"] = wokwi_gate_and_inst[
+                                         "left"] + num_and_stages_max_overall * wokwi_gate_spacing_h  # TODO/FIXME
         wokwi_design["parts"].append(wokwi_gate_or_inst)
     log.debug("Added OR gate parts to the wokwi design")
 
     # Output buffers
     for k in range(num_outputs):
         wokwi_gate_buffer_inst = wokwi_gate_buffer.copy()
-        wokwi_gate_buffer_inst["id"] = "output_"+output_names[k]
-        wokwi_gate_buffer_inst["top"] = 2 * k * wokwi_gate_spacing_v # keep some space between outputs
-        wokwi_gate_buffer_inst["left"] = wokwi_gate_or_inst["left"] + max_or_gate_stages * wokwi_gate_spacing_h # TODO/FIXME
+        wokwi_gate_buffer_inst["id"] = "output_" + output_names[k]
+        wokwi_gate_buffer_inst["top"] = 2 * k * wokwi_gate_spacing_v  # keep some space between outputs
+        wokwi_gate_buffer_inst["left"] = wokwi_gate_or_inst[
+                                             "left"] + max_or_gate_stages * wokwi_gate_spacing_h  # TODO/FIXME
         wokwi_design["parts"].append(wokwi_gate_buffer_inst)
     log.debug("Added output buffer parts to the wokwi design")
 
@@ -887,22 +920,22 @@ if __name__ == '__main__':
             }
 
             # connect design inputs to Arduino outputs
-            arduino_mega_outputs = range(2, 11+1)
+            arduino_mega_outputs = range(2, 11 + 1)
             out_idx = 0
             for input in input_names:
-                con = [ f"mega:{arduino_mega_outputs[out_idx]}", f"input_{input}:IN",
-                        con_color_arduino_interconnect, default_con_instr ]
-                log.debug("    Connection: "+str(con))
+                con = [f"mega:{arduino_mega_outputs[out_idx]}", f"input_{input}:IN",
+                       con_color_arduino_interconnect, default_con_instr]
+                log.debug("    Connection: " + str(con))
                 wokwi_design["connections"].append(con)
                 out_idx += 1
 
             # connect design outputs to Arduino outputs
-            arduino_mega_inputs = range(12, 21+1)
+            arduino_mega_inputs = range(12, 21 + 1)
             in_idx = 0
             for output in output_names:
-                con = [ f"mega:{arduino_mega_inputs[in_idx]}", f"output_{output}:OUT",
-                        con_color_arduino_interconnect, default_con_instr ]
-                log.debug("    Connection: "+str(con))
+                con = [f"mega:{arduino_mega_inputs[in_idx]}", f"output_{output}:OUT",
+                       con_color_arduino_interconnect, default_con_instr]
+                log.debug("    Connection: " + str(con))
                 wokwi_design["connections"].append(con)
                 in_idx += 1
 
@@ -946,90 +979,91 @@ if __name__ == '__main__':
         gnd_7seg["left"] = 1100
         wokwi_design["parts"].append(gnd_7seg)
 
-
         # add connections
-        for i in range(1, 8+1):
-            con = [ "vcc_dipsw:VCC", f"sw1:{i}a", con_color_vcc_interconnect, default_con_instr ]
-            log.debug("    Connection: "+str(con))
+        for i in range(1, 8 + 1):
+            con = ["vcc_dipsw:VCC", f"sw1:{i}a", con_color_vcc_interconnect, default_con_instr]
+            log.debug("    Connection: " + str(con))
             wokwi_design["connections"].append(con)
 
-        con = [ "btn1:2.r", "sw2:3", "orange", [ "h90", "*", "v10" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["btn1:2.r", "sw2:3", "orange", ["h90", "*", "v10"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
 
-        con = [ "vcc_btn:VCC", "btn1:1.r", con_color_vcc_interconnect, [ "v0" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["vcc_btn:VCC", "btn1:1.r", con_color_vcc_interconnect, ["v0"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
 
-        con = [ "sw2:1", "clock1:CLK", "green", [ "v0" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["sw2:1", "clock1:CLK", "green", ["v0"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
 
-        con = [ "sw2:3", "sw1:1b", "violet", [ "v0" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["sw2:3", "sw1:1b", "violet", ["v0"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
 
-        con = [ "chip1:EXTIN0", "sw2:2", "green", [ "h0", "v-40", "h-20" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip1:EXTIN0", "sw2:2", "green", ["h0", "v-40", "h-20"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
 
-        for i in range(2, 8+1):
-            con = [ f"chip1:EXTIN{i-1}", f"sw1:{i}b", "violet", [ "h0" ] ]
-            log.debug("    Connection: "+str(con))
+        for i in range(2, 8 + 1):
+            con = [f"chip1:EXTIN{i - 1}", f"sw1:{i}b", "violet", ["h0"]]
+            log.debug("    Connection: " + str(con))
             wokwi_design["connections"].append(con)
 
-        con = [ "chip2:EXTOUT0", "sevseg1:A", con_color_7seg_interconnect, [ "h21.01", "v-28.8", "h96" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT0", "sevseg1:A", con_color_7seg_interconnect, ["h21.01", "v-28.8", "h96"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT1", "sevseg1:B", con_color_7seg_interconnect, [ "h11.41", "v-48", "h115.2", "v38.4" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT1", "sevseg1:B", con_color_7seg_interconnect, ["h11.41", "v-48", "h115.2", "v38.4"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT2", "sevseg1:C", con_color_7seg_interconnect, [ "h30.61", "v-38.4", "h115.2", "v105.6", "h-28.8" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT2", "sevseg1:C", con_color_7seg_interconnect,
+               ["h30.61", "v-38.4", "h115.2", "v105.6", "h-28.8"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT3", "sevseg1:D", con_color_7seg_interconnect, [ "h49.81", "v57.6", "h48" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT3", "sevseg1:D", con_color_7seg_interconnect, ["h49.81", "v57.6", "h48"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT4", "sevseg1:E", con_color_7seg_interconnect, [ "v9.6", "h-48", "v-38.4" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT4", "sevseg1:E", con_color_7seg_interconnect, ["v9.6", "h-48", "v-38.4"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT5", "sevseg1:F", con_color_7seg_interconnect, [ "h69.01", "v-57.6", "h28.8" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT5", "sevseg1:F", con_color_7seg_interconnect, ["h69.01", "v-57.6", "h28.8"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT6", "sevseg1:G", con_color_7seg_interconnect, [ "h78.61", "v-57.6" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT6", "sevseg1:G", con_color_7seg_interconnect, ["h78.61", "v-57.6"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT7", "sevseg1:DP", con_color_7seg_interconnect, [ "v28.8", "h136.21" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT7", "sevseg1:DP", con_color_7seg_interconnect, ["v28.8", "h136.21"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "chip2:EXTOUT7", "sevseg1:DP", con_color_7seg_interconnect, [ "v28.8", "h136.21" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["chip2:EXTOUT7", "sevseg1:DP", con_color_7seg_interconnect, ["v28.8", "h136.21"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
-        con = [ "gnd_7seg:GND", "sevseg1:COM.1", con_color_gnd_interconnect, [ "v0" ] ]
-        log.debug("    Connection: "+str(con))
+        con = ["gnd_7seg:GND", "sevseg1:COM.1", con_color_gnd_interconnect, ["v0"]]
+        log.debug("    Connection: " + str(con))
         wokwi_design["connections"].append(con)
 
         # Check number of inputs
         if num_inputs > 8:
-            log.warn("Won't be able to connect more than 8 inputs!")
+            log.warning("Won't be able to connect more than 8 inputs!")
             num_inputs = 8
 
         for k in range(num_inputs):
-            con = [ f"chip1:IN{k}", "input_"+input_names[k]+":IN", con_color_board_interconnect, default_con_instr ]
-            log.debug("    Connection: "+str(con))
+            con = [f"chip1:IN{k}", "input_" + input_names[k] + ":IN", con_color_board_interconnect, default_con_instr]
+            log.debug("    Connection: " + str(con))
             wokwi_design["connections"].append(con)
 
         # Check number of outputs
         if num_outputs > 8:
-            log.warn("Won't be able to connect more than 8 outputs!")
+            log.warning("Won't be able to connect more than 8 outputs!")
             num_outputs = 8
 
         for k in range(num_outputs):
-            con = [ "output_"+output_names[k]+":OUT", f"chip2:OUT{k}", con_color_board_interconnect, default_con_instr ]
-            log.debug("    Connection: "+str(con))
+            con = ["output_" + output_names[k] + ":OUT", f"chip2:OUT{k}", con_color_board_interconnect,
+                   default_con_instr]
+            log.debug("    Connection: " + str(con))
             wokwi_design["connections"].append(con)
 
-    #log.debug( json.dumps(logic_meta, indent=4) )
+    # log.debug( json.dumps(logic_meta, indent=4) )
 
     wokwi_design_dump = wokwi_design
 
@@ -1047,4 +1081,4 @@ if __name__ == '__main__':
             json.dump(wokwi_design_dump, f, indent=4)
     else:
         log.info("Dumping final wokwi design to stdout...")
-        print( json.dumps(wokwi_design_dump, indent=4) )
+        print(json.dumps(wokwi_design_dump, indent=4))
