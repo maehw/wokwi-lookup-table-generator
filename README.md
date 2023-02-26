@@ -1,3 +1,5 @@
+![Python workflow badge](https://github.com/maehw/wokwi-lookup-table-generator/actions/workflows/python-app.yml/badge.svg)
+
 # Wokwi lookup table (LUT) generator
 
 ## What is this all about?
