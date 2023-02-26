@@ -27,12 +27,30 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        python generate.py -f ./demos/2bit_and.logic.json
-        python generate.py -f ./demos/2bit_comparator.logic.json
-        python generate.py -f ./demos/2bit_full_adder.logic.json
-        python generate.py -f ./demos/2bit_half_adder.logic.json
-        python generate.py -f ./demos/2bit_nand.logic.json
-        python generate.py -f ./demos/2bit_or.logic.json
-        python generate.py -f ./demos/4bit-popcount.logic.json
-        python generate.py -f ./demos/bcd_7segment_lut.logic.json
-        python generate.py -f ./demos/limited-ascii_7segment_lut.logic.json
+        
+        echo Generating ./demos/2bit_and.logic.json...
+        python generate.py -f ./demos/2bit_and.logic.json > /dev/null
+        
+        echo Generating ./demos/2bit_comparator.logic.json...
+        python generate.py -f ./demos/2bit_comparator.logic.json > /dev/null
+        
+        echo Generating ./demos/2bit_full_adder.logic.json...
+        python generate.py -f ./demos/2bit_full_adder.logic.json > /dev/null
+        
+        echo Generating ./demos/2bit_half_adder.logic.json...
+        python generate.py -f ./demos/2bit_half_adder.logic.json > /dev/null
+        
+        echo Generating ./demos/2bit_nand.logic.json...
+        python generate.py -f ./demos/2bit_nand.logic.json > /dev/null
+        
+        echo Generating ./demos/2bit_or.logic.json...
+        python generate.py -f ./demos/2bit_or.logic.json > /dev/null
+        
+        echo Generating ./demos/4bit_popcount.logic.json...
+        python generate.py -f ./demos/4bit_popcount.logic.json > /dev/null
+        
+        echo Generating ./demos/bcd_7segment_lut.logic.json...
+        python generate.py -f ./demos/bcd_7segment_lut.logic.json > /dev/null
+        
+        echo Generating ./demos/limited-ascii_7segment_lut.logic.json...
+        python generate.py -f ./demos/limited-ascii_7segment_lut.logic.json > /dev/null

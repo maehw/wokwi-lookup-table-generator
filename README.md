@@ -153,7 +153,7 @@ Some demos are working, some seem to cause trouble.
 
 ### Non-working demos
 
-* [`4bit-popcount.json`](./demos/4bit-popcount.json): 4-bit popcount (makes the generator hang up)
+* [`4bit_popcount.json`](./demos/4bit_popcount.json): 4-bit popcount (makes the generator hang up)
 
 
 ## Termination of unused gate inputs
