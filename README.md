@@ -4,7 +4,9 @@
 
 This git repository contains a **generator for [wokwi](https://wokwi.com) schematics that implement lookup tables** (defined by a truth table and some more meta data in a JSON file, see the [./demos](demos) subdirectory.
 
-But what is wokwi? Wokwi is a free, browser-based simulator that supports different Arduino and several other boards and components (such as LEDs, buttons, switches, sensors, ...). It also has been used during [#TinyTapeout](https://tinytapeout.com) in August/September 2022 - an educational project that "aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip". So oversimplified you can also easily simulate and generate ASIC designs - from a very simple boolean algebra design description (truth tables).
+But what is wokwi? Wokwi is a free, browser-based simulator that supports different Arduino and several other boards and components (such as LEDs, buttons, switches, sensors, ...).
+
+It can also be used during [#TinyTapeout](https://tinytapeout.com) events. TinyTapeout is an educational project that "aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip". So oversimplified you can also easily simulate and generate ASIC designs - from a very simple boolean algebra design description (truth tables). Actually, this script started during the first #TinyTapeout event in August/September 2022
 
 How does this work internally? See a separate section below the "Usage" section
 
@@ -14,16 +16,14 @@ Language: This project is written in Python3.
 > This project is work in progress. It is known that not all designs are generated correctly, so there are still some bugs.
 
 
-## Contribution
-
-Feel free to contribute, open issues, [work on existing issues](https://github.com/maehw/wokwi-lookup-table-generator/issues), etc.
-To contribute to the project, fork this GitHub repository and create a pull request. Detailed instructions can be found at https://docs.github.com/en/get-started/quickstart/contributing-to-projects. I'll be happy to review the code diff and eventually merge it into the original repo here.
-
 
 ## Usage
 
+To get a list of the available options, use option `--help`:
+
 ```
-usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE] [-p] [-c] [-t] [-tt]
+% python generate.py --help
+usage: generate.py [-h] [-v] [-f IN_FILE] [-o OUT_FILE] [-p] [-c] [-t] [-tt] [-tt3]
 
 generate.py is a lookup table generator tool for wokwi
 
@@ -38,27 +38,34 @@ options:
   -c, --connections_only
                         dump wokwi connections list only (default: False)
   -t, --test            add an Arduino MEGA as test framework and generate Arduino verification code (default: False)
-  -tt, --tinytapeout    add default parts used in tinytapeout wokwi template schematic (default: False)
+  -tt, --tinytapeout    add default parts used in tinytapeout 1/2 wokwi template schematic (default: False)
+  -tt3, --tinytapeout3  add default parts used in tinytapeout 3 wokwi template schematic (default: False)
 ```
 
 Examples:
 
-Only specifying the input file name, will dump the wokwi schematic via `stdout`:
+Specifying an input file name (using option `-f`) and an output file (using option `-o`) for the wokwi schematic:
+
+```
+python3 generate.py -f ./demos/2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json
+```
+
+You specifically want to generate a design that can be used for #TinyTapeout 3? Use option `--tinytapeout3`/`-tt3` to add the default parts. Example:
+
+```
+python3 generate.py -f ./demos/2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json -tt3
+```
+
+Only specifying the input file name (using option `-f`) and leaving out the optional output file specification, will dump the wokwi schematic via `stdout`:
 
 ```
 python3 generate.py -f ./demos/2bit_half_adder.logic.json
 ```
 
-Only specifying the input file name, will dump the wokwi schematic via `stdout` (piped to `/dev/null`), log level `DEBUG`:
+Only specifying the input file name (using option `-f`), will dump the wokwi schematic via `stdout` (piped to `/dev/null`), log level `DEBUG`:
 
 ```
 python3 generate.py -f ./demos/2bit_half_adder.logic.json -vv > /dev/null
-```
-
-Specify an output file for the wokwi schematic:
-
-```
-python3 generate.py -f ./demos/2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json
 ```
 
 Specify an output file for the wokwi schematic externally but also show contents on `stdout` by [piping it through `tee`](https://en.wikipedia.org/wiki/Tee_(command)):
@@ -67,7 +74,7 @@ Specify an output file for the wokwi schematic externally but also show contents
 python3 generate.py -f ./demos/2bit_half_adder.logic.json | tee 2bit_half_adder.diagram.json
 ```
 
-Switches `-p` and `-c` allow to limit the dump to wokwi parts ony respectively wokwi connections only.
+Switches `-p` and `-c` allow to limit the dump to wokwi ***p***arts ony respectively wokwi ***c***onnections only.
 
 This feature can be used to modify existing designs only. The following command can be used on Mac OS X to **copy** the parts of the design into the **p**aste **b**uffer:
 
@@ -81,8 +88,9 @@ Specify an output file for the wokwi schematic; also generate an Arduino sketch 
 python3 generate.py -f ./demos/2bit_half_adder.logic.json -o 2bit_half_adder.diagram.json -t
 ```
 
+## Using generated designs
 
-After having generated your diagram JSON file, ...
+After having generated your output diagram JSON file, ...
 
 1. go to [wokwi.com](https://wokwi.com)
 1. start a new project
@@ -146,7 +154,7 @@ Some demos are working, some seem to cause trouble.
 * [`4bit-popcount.json`](./demos/4bit-popcount.json): 4-bit popcount (makes the generator hang up)
 
 
-## Termination of unsed gate inputs
+## Termination of unused gate inputs
 
 I have basically identified two termination strategies:
 
@@ -228,7 +236,14 @@ See also:
 * [Tiny Tapeout 2 Guide](https://github.com/maehw/wokwi-lookup-table-generator/wiki/Tiny-Tapeout-2--Guide#generating-and-verifying-wokwi-designs-with-combinational-logic) - Generating and verifying wokwi designs with combinational logic
 
 
-## TODOs
+## Contribution
+
+Feel free to contribute, open issues, [work on existing issues](https://github.com/maehw/wokwi-lookup-table-generator/issues), etc.
+To contribute to the project, fork this GitHub repository and create a pull request. Detailed instructions can be found at https://docs.github.com/en/get-started/quickstart/contributing-to-projects. I'll be happy to review the code diff and eventually merge it into the original repo here.
+
+Some TODOs or ideas are already visible in the [issues tab](https://github.com/maehw/wokwi-lookup-table-generator/issues). Especially have a look at the issues labeled `good first issue` and `help wanted`.
+
+### TODOs
 
 - document limitations
 - add assertions
@@ -236,5 +251,3 @@ See also:
 - implement interactive mode
 - perform sanity checks to see if all parts are connected,
   some may be unused due to bugs (probably rounding)
-
-Some TODOs or ideas are already visible in the [issues tab](https://github.com/maehw/wokwi-lookup-table-generator/issues). Especially have a look at the issues labeled `good first issue` and `help wanted`.

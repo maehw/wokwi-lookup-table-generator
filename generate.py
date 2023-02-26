@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import json
 import math
-import coloredlogs, logging
+import coloredlogs
+import logging
 from os import linesep
 from quine_mccluskey import qm
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
@@ -30,9 +31,9 @@ if __name__ == '__main__':
                         default=None)
 
     parser.add_argument('-p', '--parts_only',
-                       action='store_true',
-                       help='dump wokwi parts list only',
-                       default=False)
+                        action='store_true',
+                        help='dump wokwi parts list only',
+                        default=False)
 
     parser.add_argument('-c', '--connections_only',
                         action='store_true',
@@ -40,12 +41,17 @@ if __name__ == '__main__':
                         default=False)
 
     parser.add_argument('-t', '--test',
-                       action='store_true',
-                       help='add an Arduino MEGA as test framework and generate Arduino verification code',
-                       default=False)
+                        action='store_true',
+                        help='add an Arduino MEGA as test framework and generate Arduino verification code',
+                        default=False)
 
     parser.add_argument('-tt', '--tinytapeout',
-                        help='add default parts used in tinytapeout wokwi template schematic',
+                        help='add default parts used in tinytapeout 1/2 wokwi template schematic',
+                        action='store_true',
+                        default=False)
+
+    parser.add_argument('-tt3', '--tinytapeout3',
+                        help='add default parts used in tinytapeout 3 wokwi template schematic',
                         action='store_true',
                         default=False)
 
@@ -145,6 +151,22 @@ if __name__ == '__main__':
     wokwi_chip_output_8pins = {
         "type": "chip-output-8-pins",
         "id": "chip2",
+        "top": -200,
+        "left": 900,
+        "attrs": { "verilogRole": "output" }
+    }
+
+    wokwi_board_tt_block_input_8 = {
+        "type": "board-tt-block-input-8",
+        "id": "ttin",
+        "top": -200,
+        "left": -230,
+        "attrs": { "verilogRole": "input" }
+    }
+
+    wokwi_board_tt_block_output = {
+        "type": "board-tt-block-output",
+        "id": "ttout",
         "top": -200,
         "left": 900,
         "attrs": { "verilogRole": "output" }
@@ -354,6 +376,11 @@ if __name__ == '__main__':
 
     if args.parts_only and args.connections_only:
         parser.error("Combination of -p and -c is currently not supported.")
+
+    if args.tinytapeout:
+        log.warning("Please note that --tinytapeout/-tt are legacy options, use --tinytapeout3/-tt3 instead.")
+    if args.tinytapeout and args.tinytapeout3:
+        parser.error("Combination of --tt and --tt3 is not supported.")
 
     # ------------------------------------------------------------------------------
     # generate insights about the design input data, i.e. log them to the console
@@ -882,18 +909,24 @@ if __name__ == '__main__':
         else:
             log.error("Unable to open Arduino sketch template file.")
 
-    if args.tinytapeout:
+    if args.tinytapeout or args.tinytapeout3:
         log.info("Adding parts from template for tinytapeout")
 
         # add parts to the wokwi schematic's parts list
         wokwi_design["parts"].append(wokwi_dip_switch8)
         wokwi_design["parts"].append(wokwi_clock_generator)
-        wokwi_design["parts"].append(wokwi_chip_input_8pins)
+        if args.tinytapeout:
+            wokwi_design["parts"].append(wokwi_chip_input_8pins)
+        elif args.tinytapeout3:
+            wokwi_design["parts"].append(wokwi_board_tt_block_input_8)
         wokwi_design["parts"].append(wokwi_slide_switch)
         wokwi_design["parts"].append(wokwi_pushbutton)
 
         # TODO/FIXME: move the next two parts to the far right, next to the output buffer of the top-most signal
-        wokwi_design["parts"].append(wokwi_chip_output_8pins)
+        if args.tinytapeout:
+            wokwi_design["parts"].append(wokwi_chip_output_8pins)
+        elif args.tinytapeout3:
+            wokwi_design["parts"].append(wokwi_board_tt_block_output)
         wokwi_design["parts"].append(wokwi_7segment)
 
         vcc_btn = wokwi_vcc.copy()
