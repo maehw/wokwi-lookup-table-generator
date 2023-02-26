@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "4-bit popcount; inspired by https://wokwi.com/projects/340285391309374034 and https://vaibhavsagar.com/blog/2019/09/08/popcount/",
+  "description": "WARNING: TRYING TO GENERATE THIS FILE WILL ENTER AN ENDLESS LOOP. THIS IS A BUG IN THE GENERATOR SCRIPT. 4-bit popcount; inspired by https://wokwi.com/projects/340285391309374034 and https://vaibhavsagar.com/blog/2019/09/08/popcount/",
   "inputs": ["a", "b", "c", "d"],
   "outputs": {
     "A": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
